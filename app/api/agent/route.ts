@@ -123,6 +123,19 @@ export async function POST(req: Request) {
             };
           },
         }),
+        readFile: tool({
+          description: "Lit et analyse le contenu d'un fichier de code fourni par l'utilisateur",
+          parameters: z.object({
+            filename: z.string().describe('Le nom du fichier'),
+            content: z.string().describe('Le contenu du fichier'),
+            analysisType: z
+              .enum(['bugs', 'improvements', 'explain', 'full'])
+              .describe("Type d'analyse : bugs, improvements, explain ou full"),
+          }),
+          execute: async ({ filename, content, analysisType }) => {
+            return { filename, content, analysisType };
+          },
+        }),
       },
     });
 

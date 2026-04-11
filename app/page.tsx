@@ -99,6 +99,23 @@ export default function Home() {
           placeholder='Pose une question sur ton code...'
           className='flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300'
         />
+
+        <input
+          type='file'
+          accept='.ts,.tsx,.js,.jsx,.json,.css'
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const content = await file.text();
+            const truncated = content.slice(0, 2000);
+            handleInputChange({
+              target: {
+                value: `Analyse ce fichier (${file.name}) :\n\`\`\`\n${truncated}\n\`\`\``,
+              },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
+          className='text-xs text-gray-400 cursor-pointer'
+        />
         <button
           type='submit'
           disabled={isLoading}
