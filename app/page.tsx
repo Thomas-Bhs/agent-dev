@@ -2,11 +2,14 @@
 
 import { useChat } from '@ai-sdk/react';
 import ReactMarkdown from 'react-markdown';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [fileContent, setFileContent] = useState<{ name: string; content: string } | null>(null);
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/agent',
+    body: { fileContent },
     onError: (error) => console.error('useChat error:', error),
   });
 
@@ -92,6 +95,18 @@ export default function Home() {
         {isLoading && <div className='text-sm text-gray-400 italic px-3'>L'agent réfléchit...</div>}
       </div>
 
+      {fileContent && (
+        <div className='flex items-center gap-2 mb-2 px-2 py-1 border border-gray-200 rounded-lg text-xs text-gray-500'>
+          <span>Fichier : {fileContent.name}</span>
+          <button
+            onClick={() => setFileContent(null)}
+            className='text-gray-400 hover:text-gray-600 ml-auto'
+          >
+            x
+          </button>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className='flex gap-2'>
         <input
           value={input}
@@ -100,22 +115,21 @@ export default function Home() {
           className='flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300'
         />
 
-        <input
-          type='file'
-          accept='.ts,.tsx,.js,.jsx,.json,.css'
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            const content = await file.text();
-            const truncated = content.slice(0, 2000);
-            handleInputChange({
-              target: {
-                value: `Analyse ce fichier (${file.name}) :\n\`\`\`\n${truncated}\n\`\`\``,
-              },
-            } as React.ChangeEvent<HTMLInputElement>);
-          }}
-          className='text-xs text-gray-400 cursor-pointer'
-        />
+        <label className='cursor-pointer text-xs text-gray-400 border border-gray-200 px-2 py-2 rounded-lg hover:bg-gray-50 flex items-center'>
+          Fichier
+          <input
+            type='file'
+            accept='.ts,.tsx,.js,.jsx,.json,.css'
+            className='hidden'
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const content = await file.text();
+              setFileContent({ name: file.name, content: content.slice(0, 2000) });
+              e.target.value = '';
+            }}
+          />
+        </label>
         <button
           type='submit'
           disabled={isLoading}

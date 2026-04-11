@@ -9,11 +9,9 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages, fileContent } = await req.json();
 
-    const result = streamText({
-      model: groq('llama-3.3-70b-versatile'),
-      system: `Tu es un agent expert en développement web et mobile (React, Next.js, React Native, Node.js, TypeScript).
+    const baseSystem = `Tu es un agent expert en développement web et mobile (React, Next.js, React Native, Node.js, TypeScript).
 
       Ton rôle :
       - Analyser du code et identifier les problèmes
@@ -29,8 +27,15 @@ export async function POST(req: Request) {
       - Signaler les breaking changes ou dépendances importantes
       - Ne jamais répondre sans exemple de code sauf si la question est purement conceptuelle
       - Pour toute question sur Next.js, React, React Native ou CSS, utiliser TOUJOURS le tool searchDocs avant de répondre
-      - Quand tu utilises searchDocs, base ta réponse UNIQUEMENT sur les résultats retournés par le tool. Cite toujours l'URL source à la fin de ta réponse.`,
+      - Quand tu utilises searchDocs, base ta réponse UNIQUEMENT sur les résultats retournés par le tool. Cite toujours l'URL source à la fin de ta réponse.`;
 
+    const system = fileContent
+      ? `${baseSystem}\n\nFichier attaché par l'utilisateur (${fileContent.name}):\n\`\`\`\n${fileContent.content}\n\`\`\``
+      : baseSystem;
+
+    const result = streamText({
+      model: groq('llama-3.3-70b-versatile'),
+      system,
       messages,
       maxSteps: 3,
       onError: (error) => console.error('streamText error:', JSON.stringify(error)),
