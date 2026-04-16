@@ -1,21 +1,182 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import Topbar from './components/layout/Topbar';
+import Sidebar from './components/layout/Sidebar';
+import ChatMessages from './components/chat/ChatMessages';
+import ChatInput from './components/chat/ChatInput';
+
+interface FileContent {
+  name: string;
+  content: string;
+}
+
+interface Conversation {
+  id: string;
+  title: string;
+  agentName: string;
+  agentColor: string;
+  date: string;
+}
+
+const AGENTS = [
+  {
+    id: 'dev',
+    name: 'Dev',
+    description: 'Code, composants, architecture',
+    iconBg: '#eef2ff',
+    badge: 'active' as const,
+    color: '#6366f1',
+    isDisabled: false,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <path
+          d='M4 14V6l5-2 5 2v8'
+          stroke='#6366f1'
+          strokeWidth='1.3'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+        <rect x='7' y='10' width='4' height='4' rx='0.5' stroke='#6366f1' strokeWidth='1.2' />
+      </svg>
+    ),
+  },
+  {
+    id: 'debug',
+    name: 'Debug',
+    description: 'Erreurs, logs, fixes',
+    iconBg: '#fef3c7',
+    badge: 'soon' as const,
+    color: '#d97706',
+    isDisabled: true,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <circle cx='9' cy='9' r='5' stroke='#d97706' strokeWidth='1.3' />
+        <path d='M9 6v3l2 2' stroke='#d97706' strokeWidth='1.3' strokeLinecap='round' />
+      </svg>
+    ),
+  },
+  {
+    id: 'uiux',
+    name: 'UI/UX',
+    description: 'Design, composants visuels',
+    iconBg: '#f0fdf4',
+    badge: 'soon' as const,
+    color: '#22c55e',
+    isDisabled: true,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <rect x='3' y='3' width='12' height='12' rx='2' stroke='#86efac' strokeWidth='1.3' />
+        <path d='M6 9h6M9 6v6' stroke='#86efac' strokeWidth='1.3' strokeLinecap='round' />
+      </svg>
+    ),
+  },
+  {
+    id: 'qa',
+    name: 'QA',
+    description: 'Tests, qualité, couverture',
+    iconBg: '#fdf4ff',
+    badge: 'soon' as const,
+    color: '#a855f7',
+    isDisabled: true,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <path
+          d='M4 14l3-3 2 2 5-6'
+          stroke='#d8b4fe'
+          strokeWidth='1.3'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'designer',
+    name: 'Designer',
+    description: 'Maquettes, style guide',
+    iconBg: '#fff7ed',
+    badge: 'soon' as const,
+    color: '#f97316',
+    isDisabled: true,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <circle cx='9' cy='7' r='3' stroke='#fb923c' strokeWidth='1.3' />
+        <path
+          d='M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6'
+          stroke='#fb923c'
+          strokeWidth='1.3'
+          strokeLinecap='round'
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'orchestrator',
+    name: 'Orchestrateur',
+    description: 'Coordonne les agents',
+    iconBg: '#f0f9ff',
+    badge: 'soon' as const,
+    color: '#0ea5e9',
+    isDisabled: true,
+    icon: (
+      <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <path
+          d='M9 3v3M9 12v3M3 9h3M12 9h3'
+          stroke='#38bdf8'
+          strokeWidth='1.3'
+          strokeLinecap='round'
+        />
+        <circle cx='9' cy='9' r='2.5' stroke='#38bdf8' strokeWidth='1.3' />
+      </svg>
+    ),
+  },
+];
 
 export default function Home() {
-  const [fileContent, setFileContent] = useState<{ name: string; content: string } | null>(null);
+  const [selectedAgentId, setSelectedAgentId] = useState('dev');
+  const [fileContent, setFileContent] = useState<FileContent | null>(null);
+  const [isDark, setIsDark] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState('1');
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/agent',
     body: { fileContent },
     onError: (error) => console.error('useChat error:', error),
+    onFinish: (message) => {
+      if (messages.length === 0) {
+        const title = input.slice(0, 40) || 'Nouvelle conversation';
+        const newConv: Conversation = {
+          id: activeConversationId,
+          title,
+          agentName: 'Agent Dev',
+          agentColor: '#6366f1',
+          date: 'maintenant',
+        };
+        setConversations((prev) => [newConv, ...prev.filter((c) => c.id !== activeConversationId)]);
+      }
+    },
   });
 
   useEffect(() => {
     const saved = localStorage.getItem('agent-history');
-    if (saved) setMessages(JSON.parse(saved));
+    const savedConvs = localStorage.getItem('agent-conversations');
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    if (savedConvs) {
+      try {
+        setConversations(JSON.parse(savedConvs));
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -24,120 +185,59 @@ export default function Home() {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (conversations.length > 0) {
+      localStorage.setItem('agent-conversations', JSON.stringify(conversations));
+    }
+  }, [conversations]);
+
+  const handleClear = () => {
+    setMessages([]);
+    localStorage.removeItem('agent-history');
+  };
+
+  const handleNewConversation = () => {
+    handleClear();
+    setActiveConversationId(Date.now().toString());
+    setFileContent(null);
+  };
+
+  const selectedAgent = AGENTS.find((a) => a.id === selectedAgentId);
+
   return (
-    <main className='max-w-2xl mx-auto p-4 flex flex-col h-screen'>
-      <div className='flex items-center justify-between mb-4'>
-        <h1 className='text-xl font-medium'>Agent Dev</h1>
-        <button
-          onClick={() => {
-            setMessages([]);
-            localStorage.removeItem('agent-history');
-          }}
-          className='text-xs text-gray-400 hover:text-gray-600 border border-gray-200 px-2 py-1 rounded'
-        >
-          Effacer
-        </button>
-      </div>
+    <div className='flex flex-col h-screen bg-gray-50'>
+      <Topbar
+        activeAgents={
+          selectedAgent ? [{ name: `Agent ${selectedAgent.name}`, color: 'indigo' }] : []
+        }
+        isDark={isDark}
+        onThemeToggle={() => setIsDark(!isDark)}
+        onClear={handleClear}
+      />
 
-      <div className='flex-1 overflow-y-auto space-y-4 mb-4'>
-        {messages.map((m) => (
-          <div key={m.id}>
-            {m.role === 'assistant' &&
-              m.toolInvocations?.map((tool) => (
-                <div key={tool.toolCallId} className='text-xs text-gray-400 italic px-3 py-1 mb-1'>
-                  {tool.state === 'call' || tool.state === 'partial-call'
-                    ? `L'agent utilise : ${tool.toolName}...`
-                    : `Outil terminé : ${tool.toolName}`}
-                </div>
-              ))}
-            <div
-              className={`p-3 rounded-lg text-sm ${
-                m.role === 'user' ? 'border border-blue-200 ml-8' : 'border border-gray-200 mr-8'
-              }`}
-            >
-              <span className='font-medium text-xs text-gray-400 block mb-2'>
-                {m.role === 'user' ? 'Toi' : 'Agent'}
-              </span>
-              {m.role === 'assistant' ? (
-                <ReactMarkdown
-                  components={{
-                    code({ className, children }) {
-                      const isBlock = className?.includes('language-');
-                      return isBlock ? (
-                        <pre className='bg-gray-900 text-gray-100 p-3 rounded-md overflow-x-auto my-2 text-xs'>
-                          <code>{children}</code>
-                        </pre>
-                      ) : (
-                        <code className='bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-xs'>
-                          {children}
-                        </code>
-                      );
-                    },
-                    p({ children }) {
-                      return <p className='mb-2 last:mb-0'>{children}</p>;
-                    },
-                    ul({ children }) {
-                      return <ul className='list-disc pl-4 mb-2 space-y-1'>{children}</ul>;
-                    },
-                    ol({ children }) {
-                      return <ol className='list-decimal pl-4 mb-2 space-y-1'>{children}</ol>;
-                    },
-                  }}
-                >
-                  {m.content}
-                </ReactMarkdown>
-              ) : (
-                <p>{m.content}</p>
-              )}
-            </div>
-          </div>
-        ))}
-        {isLoading && <div className='text-sm text-gray-400 italic px-3'>L'agent réfléchit...</div>}
-      </div>
-
-      {fileContent && (
-        <div className='flex items-center gap-2 mb-2 px-2 py-1 border border-gray-200 rounded-lg text-xs text-gray-500'>
-          <span>Fichier : {fileContent.name}</span>
-          <button
-            onClick={() => setFileContent(null)}
-            className='text-gray-400 hover:text-gray-600 ml-auto'
-          >
-            x
-          </button>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className='flex gap-2'>
-        <input
-          value={input}
-          onChange={handleInputChange}
-          placeholder='Pose une question sur ton code...'
-          className='flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300'
+      <div className='flex flex-1 overflow-hidden'>
+        <Sidebar
+          agents={AGENTS}
+          selectedAgentId={selectedAgentId}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onAgentSelect={setSelectedAgentId}
+          onConversationSelect={(id) => setActiveConversationId(id)}
+          onNewConversation={handleNewConversation}
         />
 
-        <label className='cursor-pointer text-xs text-gray-400 border border-gray-200 px-2 py-2 rounded-lg hover:bg-gray-50 flex items-center'>
-          Fichier
-          <input
-            type='file'
-            accept='.ts,.tsx,.js,.jsx,.json,.css'
-            className='hidden'
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const content = await file.text();
-              setFileContent({ name: file.name, content: content.slice(0, 2000) });
-              e.target.value = '';
-            }}
+        <div className='flex flex-col flex-1 overflow-hidden'>
+          <ChatMessages messages={messages} isLoading={isLoading} />
+          <ChatInput
+            input={input}
+            isLoading={isLoading}
+            fileContent={fileContent}
+            onInputChange={handleInputChange}
+            onSubmit={handleSubmit}
+            onFileChange={setFileContent}
           />
-        </label>
-        <button
-          type='submit'
-          disabled={isLoading}
-          className='bg-black text-white px-4 py-2 rounded-lg text-sm disabled:opacity-40'
-        >
-          Envoyer
-        </button>
-      </form>
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }
