@@ -140,11 +140,21 @@ export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState('1');
+  const [error, setError] = useState<string | null>(null);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: '/api/agent',
     body: { fileContent },
-    onError: (error) => console.error('useChat error:', error),
+    onError: (error) => {
+      console.error('useChat error:', error);
+      if (error.message.includes('rate limit') || error.message.includes('429')) {
+        setError('Limite de requêtes atteinte — attends quelques secondes et réessaie.');
+      } else if (error.message.includes('403')) {
+        setError('Accès refusé — vérifie ta connexion réseau ou désactive ton VPN.');
+      } else {
+        setError('Une erreur est survenue — réessaie.');
+      }
+    },
     onFinish: (message) => {
       if (messages.length === 0) {
         const title = input.slice(0, 40) || 'Nouvelle conversation';
@@ -228,6 +238,17 @@ export default function Home() {
 
         <div className='flex flex-col flex-1 overflow-hidden'>
           <ChatMessages messages={messages} isLoading={isLoading} />
+          {error && (
+            <div className='mx-5 mb-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between'>
+              <p className='text-xs text-red-600'>{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className='text-red-400 hover:text-red-600 text-sm ml-3'
+              >
+                ×
+              </button>
+            </div>
+          )}
           <ChatInput
             input={input}
             isLoading={isLoading}
