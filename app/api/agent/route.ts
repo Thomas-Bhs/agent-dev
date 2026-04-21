@@ -43,7 +43,7 @@ export const POST = traceable(
         model: groq('llama-3.3-70b-versatile'),
         system,
         messages,
-        maxSteps: 1,
+        maxSteps: 3,
         onError: (error) => console.error('streamText error:', JSON.stringify(error)),
         tools: {
           analyzeCode: tool({
