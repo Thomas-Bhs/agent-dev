@@ -126,7 +126,7 @@ export const POST = traceable(
                 )}. Description : ${description}`,
               };
             },
-          }) /*,
+          }),
           readFile: tool({
             description: "Lit et analyse le contenu d'un fichier de code fourni par l'utilisateur",
             parameters: z.object({
@@ -139,7 +139,7 @@ export const POST = traceable(
             execute: async ({ filename, content, analysisType }) => {
               return { filename, content, analysisType };
             },
-          }),*/,
+          }),
         },
       });
 
