@@ -56,7 +56,7 @@ export const POST = traceable(
             execute: async ({ code, language }) => {
               return { code, language, timestamp: new Date().toISOString() };
             },
-          }),/*
+          }),
           suggestFileStructure: tool({
             description: 'Suggère une structure de fichiers pour un type de feature donné',
             parameters: z.object({
@@ -68,7 +68,7 @@ export const POST = traceable(
             execute: async ({ featureType, platform }) => {
               return { featureType, platform };
             },
-          }),
+          }),/*
           searchDocs: tool({
             description:
               'Recherche dans la documentation officielle de Next.js, React, React Native ou MDN',
