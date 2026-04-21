@@ -43,9 +43,9 @@ export const POST = traceable(
         model: groq('llama-3.3-70b-versatile'),
         system,
         messages,
-        maxSteps: 3,
+        maxSteps: 1,
         onError: (error) => console.error('streamText error:', JSON.stringify(error)),
-        tools: {
+        /*tools: {
           analyzeCode: tool({
             description:
               'Analyse un bloc de code et identifie les problèmes ou améliorations possibles',
@@ -140,7 +140,7 @@ export const POST = traceable(
               return { filename, content, analysisType };
             },
           }),
-        },
+        },*/
       });
 
       return result.toDataStreamResponse();
