@@ -45,7 +45,7 @@ export const POST = traceable(
         messages,
         maxSteps: 1,
         onError: (error) => console.error('streamText error:', JSON.stringify(error)),
-        /*tools: {
+        tools: {
           analyzeCode: tool({
             description:
               'Analyse un bloc de code et identifie les problèmes ou améliorations possibles',
@@ -56,7 +56,7 @@ export const POST = traceable(
             execute: async ({ code, language }) => {
               return { code, language, timestamp: new Date().toISOString() };
             },
-          }),
+          }),/*
           suggestFileStructure: tool({
             description: 'Suggère une structure de fichiers pour un type de feature donné',
             parameters: z.object({
@@ -139,8 +139,8 @@ export const POST = traceable(
             execute: async ({ filename, content, analysisType }) => {
               return { filename, content, analysisType };
             },
-          }),
-        },*/
+          }),*/
+        },
       });
 
       return result.toDataStreamResponse();
