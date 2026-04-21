@@ -1,16 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { Message } from '@ai-sdk/react';
 import MessageBubble from './MessageBubble';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  toolInvocations?: {
-    toolCallId: string;
-    toolName: string;
-    state: 'partial-call' | 'call' | 'result';
-  }[];
-}
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -50,11 +40,15 @@ export default function ChatMessages({ messages, isLoading }: ChatMessagesProps)
       {messages.map((m) => (
         <MessageBubble
           key={m.id}
-          role={m.role}
-          content={m.content}
+          role={m.role === 'user' ? 'user' : 'assistant'}
+          content={typeof m.content === 'string' ? m.content : ''}
           agentName='Agent Dev'
           agentColor='bg-indigo-50 text-indigo-600'
-          toolInvocations={m.toolInvocations}
+          toolInvocations={m.toolInvocations?.map((t) => ({
+            toolCallId: t.toolCallId,
+            toolName: t.toolName,
+            state: t.state as 'partial-call' | 'call' | 'result',
+          }))}
         />
       ))}
 
