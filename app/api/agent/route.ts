@@ -99,7 +99,7 @@ export const POST = traceable(
                 })),
               };
             },
-          })/*,
+          }),
           generateComponent: tool({
             description:
               "Génère un composant React ou React Native complet à partir d'une description",
@@ -126,7 +126,7 @@ export const POST = traceable(
                 )}. Description : ${description}`,
               };
             },
-          }),
+          }) /*,
           readFile: tool({
             description: "Lit et analyse le contenu d'un fichier de code fourni par l'utilisateur",
             parameters: z.object({
