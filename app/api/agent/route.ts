@@ -68,7 +68,7 @@ export const POST = traceable(
             execute: async ({ featureType, platform }) => {
               return { featureType, platform };
             },
-          }),/*
+          }),
           searchDocs: tool({
             description:
               'Recherche dans la documentation officielle de Next.js, React, React Native ou MDN',
@@ -99,7 +99,7 @@ export const POST = traceable(
                 })),
               };
             },
-          }),
+          })/*,
           generateComponent: tool({
             description:
               "Génère un composant React ou React Native complet à partir d'une description",
@@ -139,7 +139,7 @@ export const POST = traceable(
             execute: async ({ filename, content, analysisType }) => {
               return { filename, content, analysisType };
             },
-          }),*/
+          }),*/,
         },
       });
 
