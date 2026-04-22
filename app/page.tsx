@@ -24,111 +24,153 @@ const AGENTS = [
   {
     id: 'dev',
     name: 'Dev',
-    description: 'Code, composants, architecture',
-    iconBg: '#eef2ff',
+    description: 'Code, components, architecture',
+    iconBg: '#dbeafe',
     badge: 'active' as const,
-    color: '#6366f1',
+    color: '#2563eb',
     isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
         <path
-          d='M4 14V6l5-2 5 2v8'
-          stroke='#6366f1'
-          strokeWidth='1.3'
+          d='M5 7L2 9l3 2'
+          stroke='#2563eb'
+          strokeWidth='1.5'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
-        <rect x='7' y='10' width='4' height='4' rx='0.5' stroke='#6366f1' strokeWidth='1.2' />
+        <path
+          d='M13 7l3 2-3 2'
+          stroke='#2563eb'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+        />
+        <path d='M10.5 4l-3 10' stroke='#2563eb' strokeWidth='1.5' strokeLinecap='round' />
       </svg>
     ),
   },
   {
     id: 'debug',
     name: 'Debug',
-    description: 'Erreurs, logs, fixes',
-    iconBg: '#fef3c7',
+    description: 'Errors, logs, fixes',
+    iconBg: '#fee2e2',
     badge: 'active' as const,
-    color: '#d97706',
+    color: '#dc2626',
     isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
-        <circle cx='9' cy='9' r='5' stroke='#d97706' strokeWidth='1.3' />
-        <path d='M9 6v3l2 2' stroke='#d97706' strokeWidth='1.3' strokeLinecap='round' />
+        <path
+          d='M9 3a4 4 0 014 4v2a4 4 0 01-8 0V7a4 4 0 014-4z'
+          stroke='#dc2626'
+          strokeWidth='1.5'
+        />
+        <path
+          d='M5 8H2M16 8h-3M9 13v2M6 15.5h6'
+          stroke='#dc2626'
+          strokeWidth='1.5'
+          strokeLinecap='round'
+        />
+        <path d='M5.5 5L3 3M12.5 5L15 3' stroke='#dc2626' strokeWidth='1.5' strokeLinecap='round' />
       </svg>
     ),
   },
   {
     id: 'uiux',
     name: 'UI/UX',
-    description: 'Design, composants visuels',
-    iconBg: '#f0fdf4',
+    description: 'Design, visual components',
+    iconBg: '#fae8ff',
     badge: 'soon' as const,
-    color: '#22c55e',
+    color: '#a21caf',
     isDisabled: true,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
-        <rect x='3' y='3' width='12' height='12' rx='2' stroke='#86efac' strokeWidth='1.3' />
-        <path d='M6 9h6M9 6v6' stroke='#86efac' strokeWidth='1.3' strokeLinecap='round' />
+        <rect x='2' y='2' width='6' height='6' rx='1.5' stroke='#a21caf' strokeWidth='1.5' />
+        <rect
+          x='10'
+          y='2'
+          width='6'
+          height='6'
+          rx='1.5'
+          stroke='#a21caf'
+          strokeWidth='1.5'
+          strokeDasharray='2 1'
+        />
+        <rect
+          x='2'
+          y='10'
+          width='6'
+          height='6'
+          rx='1.5'
+          stroke='#a21caf'
+          strokeWidth='1.5'
+          strokeDasharray='2 1'
+        />
+        <rect x='10' y='10' width='6' height='6' rx='1.5' stroke='#a21caf' strokeWidth='1.5' />
       </svg>
     ),
   },
   {
     id: 'qa',
     name: 'QA',
-    description: 'Tests, qualité, couverture',
-    iconBg: '#fdf4ff',
+    description: 'Tests, quality, coverage',
+    iconBg: '#dcfce7',
     badge: 'active' as const,
-    color: '#a855f7',
+    color: '#16a34a',
     isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
         <path
-          d='M4 14l3-3 2 2 5-6'
-          stroke='#d8b4fe'
-          strokeWidth='1.3'
+          d='M3 9l4 4 8-8'
+          stroke='#16a34a'
+          strokeWidth='1.8'
           strokeLinecap='round'
           strokeLinejoin='round'
         />
+        <circle cx='9' cy='9' r='7' stroke='#16a34a' strokeWidth='1.5' />
       </svg>
     ),
   },
   {
     id: 'designer',
     name: 'Designer',
-    description: 'Maquettes, style guide',
+    description: 'Mockups, style guide',
     iconBg: '#fff7ed',
     badge: 'soon' as const,
-    color: '#f97316',
+    color: '#ea580c',
     isDisabled: true,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
-        <circle cx='9' cy='7' r='3' stroke='#fb923c' strokeWidth='1.3' />
         <path
-          d='M3 15c0-3.3 2.7-6 6-6s6 2.7 6 6'
-          stroke='#fb923c'
-          strokeWidth='1.3'
+          d='M3 15l3-1 8-8-2-2-8 8-1 3z'
+          stroke='#ea580c'
+          strokeWidth='1.5'
           strokeLinecap='round'
+          strokeLinejoin='round'
         />
+        <path d='M12 4l2 2' stroke='#ea580c' strokeWidth='1.5' strokeLinecap='round' />
+        <circle cx='5.5' cy='12.5' r='1' fill='#ea580c' />
       </svg>
     ),
   },
   {
     id: 'orchestrator',
-    name: 'Orchestrateur',
-    description: 'Coordonne les agents',
-    iconBg: '#f0f9ff',
+    name: 'Orchestrator',
+    description: 'Coordinates agents',
+    iconBg: '#e0f2fe',
     badge: 'soon' as const,
-    color: '#0ea5e9',
+    color: '#0284c7',
     isDisabled: true,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
+        <circle cx='9' cy='4' r='2' stroke='#0284c7' strokeWidth='1.5' />
+        <circle cx='3' cy='14' r='2' stroke='#0284c7' strokeWidth='1.5' />
+        <circle cx='15' cy='14' r='2' stroke='#0284c7' strokeWidth='1.5' />
         <path
-          d='M9 3v3M9 12v3M3 9h3M12 9h3'
-          stroke='#38bdf8'
-          strokeWidth='1.3'
+          d='M9 6v3M9 9l-4.5 3M9 9l4.5 3'
+          stroke='#0284c7'
+          strokeWidth='1.5'
           strokeLinecap='round'
         />
-        <circle cx='9' cy='9' r='2.5' stroke='#38bdf8' strokeWidth='1.3' />
       </svg>
     ),
   },
@@ -228,7 +270,7 @@ export default function Home() {
   const selectedAgent = AGENTS.find((a) => a.id === selectedAgentId);
 
   return (
-    <div className='flex flex-col h-screen bg-gray-50'>
+    <div className='flex flex-col h-screen bg-[#f5f5f7]'>
       <Topbar
         activeAgents={
           selectedAgent
@@ -251,32 +293,37 @@ export default function Home() {
           selectedAgentId={selectedAgentId}
           conversations={conversations}
           activeConversationId={activeConversationId}
-          onAgentSelect={setSelectedAgentId}
+          onAgentSelect={(id) => {
+            setSelectedAgentId(id);
+            handleClear();
+          }}
           onConversationSelect={(id) => setActiveConversationId(id)}
           onNewConversation={handleNewConversation}
         />
 
-        <div className='flex flex-col flex-1 overflow-hidden'>
-          <ChatMessages messages={messages} isLoading={isLoading} />
-          {error && (
-            <div className='mx-5 mb-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between'>
-              <p className='text-xs text-red-600'>{error}</p>
-              <button
-                onClick={() => setError(null)}
-                className='text-red-400 hover:text-red-600 text-sm ml-3'
-              >
-                ×
-              </button>
-            </div>
-          )}
-          <ChatInput
-            input={input}
-            isLoading={isLoading}
-            fileContent={fileContent}
-            onInputChange={handleInputChange}
-            onSubmit={handleSubmit}
-            onFileChange={setFileContent}
-          />
+        <div className='flex flex-col flex-1 overflow-hidden bg-[#f5f5f7]'>
+          <div className='flex-1 overflow-hidden flex flex-col mx-4 my-4 bg-white rounded-3xl border border-gray-200/80 shadow-sm'>
+            <ChatMessages messages={messages} isLoading={isLoading} />
+            {error && (
+              <div className='mx-4 mb-3 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-between'>
+                <p className='text-xs text-red-500'>{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className='text-red-300 hover:text-red-500 text-sm ml-3 transition-colors'
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <ChatInput
+              input={input}
+              isLoading={isLoading}
+              fileContent={fileContent}
+              onInputChange={handleInputChange}
+              onSubmit={handleSubmit}
+              onFileChange={setFileContent}
+            />
+          </div>
         </div>
       </div>
     </div>
