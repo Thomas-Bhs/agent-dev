@@ -47,9 +47,9 @@ const AGENTS = [
     name: 'Debug',
     description: 'Erreurs, logs, fixes',
     iconBg: '#fef3c7',
-    badge: 'soon' as const,
+    badge: 'active' as const,
     color: '#d97706',
-    isDisabled: true,
+    isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
         <circle cx='9' cy='9' r='5' stroke='#d97706' strokeWidth='1.3' />
@@ -77,9 +77,9 @@ const AGENTS = [
     name: 'QA',
     description: 'Tests, qualité, couverture',
     iconBg: '#fdf4ff',
-    badge: 'soon' as const,
+    badge: 'active' as const,
     color: '#a855f7',
-    isDisabled: true,
+    isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
         <path
@@ -134,6 +134,12 @@ const AGENTS = [
   },
 ];
 
+const agentChipColors: Record<string, 'indigo' | 'amber' | 'green' | 'purple' | 'sky'> = {
+  dev: 'indigo',
+  debug: 'amber',
+  qa: 'purple',
+};
+
 export default function Home() {
   const [selectedAgentId, setSelectedAgentId] = useState('dev');
   const [fileContent, setFileContent] = useState<FileContent | null>(null);
@@ -142,8 +148,15 @@ export default function Home() {
   const [activeConversationId, setActiveConversationId] = useState('1');
   const [error, setError] = useState<string | null>(null);
 
+  //mapping agent id to api route
+  const agentRoutes: Record<string, string> = {
+    dev: '/api/agents/dev',
+    debug: '/api/agents/debug',
+    qa: '/api/agents/qa',
+  };
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
-    api: '/api/agent',
+    api: agentRoutes[selectedAgentId] || '/api/agents/dev',
     body: { fileContent },
     onError: (error) => {
       console.error('useChat error:', error);
@@ -155,14 +168,14 @@ export default function Home() {
         setError('Une erreur est survenue — réessaie.');
       }
     },
-    onFinish: (message) => {
+    onFinish: () => {
       if (messages.length === 0) {
         const title = input.slice(0, 40) || 'Nouvelle conversation';
         const newConv: Conversation = {
           id: activeConversationId,
           title,
-          agentName: 'Agent Dev',
-          agentColor: '#6366f1',
+          agentName: `Agent ${selectedAgent?.name || 'Dev'}`,
+          agentColor: selectedAgent?.color || '#6366f1',
           date: 'maintenant',
         };
         setConversations((prev) => [newConv, ...prev.filter((c) => c.id !== activeConversationId)]);
@@ -218,7 +231,14 @@ export default function Home() {
     <div className='flex flex-col h-screen bg-gray-50'>
       <Topbar
         activeAgents={
-          selectedAgent ? [{ name: `Agent ${selectedAgent.name}`, color: 'indigo' }] : []
+          selectedAgent
+            ? [
+                {
+                  name: `Agent ${selectedAgent.name}`,
+                  color: agentChipColors[selectedAgentId] || 'indigo',
+                },
+              ]
+            : []
         }
         isDark={isDark}
         onThemeToggle={() => setIsDark(!isDark)}
