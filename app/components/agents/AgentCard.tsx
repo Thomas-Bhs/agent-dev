@@ -1,21 +1,21 @@
-import { cn } from '@/app/lib/utils';
+import { cn } from '@/app/lib/utils'
 
 interface AgentCardProps {
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  iconBg: string;
-  badge: 'active' | 'ready' | 'soon';
-  isSelected?: boolean;
-  isDisabled?: boolean;
-  onClick?: () => void;
+  name: string
+  description: string
+  icon: React.ReactNode
+  iconBg: string
+  badge: 'active' | 'ready' | 'soon'
+  isSelected?: boolean
+  isDisabled?: boolean
+  onClick?: () => void
 }
 
 const badgeConfig = {
-  active: { label: 'Actif', className: 'bg-indigo-50 text-indigo-600' },
-  ready: { label: 'Prêt', className: 'bg-green-50 text-green-600' },
-  soon: { label: 'Bientôt', className: 'bg-gray-100 text-gray-400' },
-};
+  active: { label: 'Active', className: 'bg-emerald-50 text-emerald-600' },
+  ready: { label: 'Ready', className: 'bg-blue-50 text-blue-600' },
+  soon: { label: 'Soon', className: 'bg-gray-100 text-gray-400' },
+}
 
 export default function AgentCard({
   name,
@@ -31,29 +31,47 @@ export default function AgentCard({
     <div
       onClick={isDisabled ? undefined : onClick}
       className={cn(
-        'p-3 rounded-xl border-2 transition-all duration-150',
+        'p-3 rounded-2xl border transition-all duration-150 group',
         isDisabled
-          ? 'opacity-45 cursor-not-allowed border-gray-100'
-          : 'cursor-pointer hover:border-indigo-200 hover:bg-indigo-50/30',
-        isSelected ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 bg-white'
+          ? 'opacity-40 cursor-not-allowed border-gray-100 bg-white'
+          : 'cursor-pointer',
+        isSelected
+          ? 'border-gray-950 bg-gray-950'
+          : 'border-gray-100 bg-white hover:border-gray-300 hover:shadow-sm'
       )}
     >
       <div
-        className='w-8 h-8 rounded-lg flex items-center justify-center mb-2'
-        style={{ background: iconBg }}
+        className={cn(
+          'w-8 h-8 rounded-xl flex items-center justify-center mb-2.5 transition-colors',
+          isSelected ? 'bg-white/10' : ''
+        )}
+        style={isSelected ? {} : { background: iconBg }}
       >
         {icon}
       </div>
-      <p className='text-xs font-semibold text-gray-900 mb-0.5'>{name}</p>
-      <p className='text-[10px] text-gray-400 leading-snug'>{description}</p>
-      <span
-        className={cn(
-          'inline-block text-[9px] font-semibold px-1.5 py-0.5 rounded-full mt-1.5',
-          badgeConfig[badge].className
-        )}
-      >
+
+      <p className={cn(
+        'text-xs font-bold mb-0.5 tracking-tight',
+        isSelected ? 'text-white' : 'text-gray-900'
+      )}>
+        {name}
+      </p>
+
+      <p className={cn(
+        'text-[10px] leading-snug mb-2',
+        isSelected ? 'text-gray-400' : 'text-gray-400'
+      )}>
+        {description}
+      </p>
+
+      <span className={cn(
+        'inline-block text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide',
+        isSelected
+          ? 'bg-white/10 text-white/60'
+          : badgeConfig[badge].className
+      )}>
         {badgeConfig[badge].label}
       </span>
     </div>
-  );
+  )
 }

@@ -20,13 +20,13 @@ export default function MessageBubble({
   role,
   content,
   agentName = 'Agent',
-  agentColor = 'bg-indigo-50 text-indigo-600',
+  agentColor = 'bg-gray-950 text-white',
   toolInvocations,
 }: MessageBubbleProps) {
   if (role === 'user') {
     return (
       <div className='flex justify-end'>
-        <div className='max-w-[75%] bg-gray-900 text-white px-4 py-2.5 rounded-xl rounded-br-sm text-sm leading-relaxed'>
+        <div className='max-w-[75%] bg-gray-950 text-white px-4 py-3 rounded-2xl rounded-br-sm text-sm leading-relaxed'>
           {content}
         </div>
       </div>
@@ -34,18 +34,18 @@ export default function MessageBubble({
   }
 
   return (
-    <div className='flex gap-2.5 items-start'>
+    <div className='flex gap-3 items-start'>
       <div
         className={cn(
-          'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5',
+          'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5',
           agentColor
         )}
       >
         {agentName.slice(0, 1)}
       </div>
 
-      <div className='flex-1'>
-        <p className='text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1'>
+      <div className='flex-1 min-w-0'>
+        <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5'>
           {agentName}
         </p>
 
@@ -58,17 +58,17 @@ export default function MessageBubble({
         ))}
 
         {content && (
-          <div className='bg-white border border-gray-100 rounded-sm rounded-tl-none rounded-xl px-4 py-3 text-sm text-gray-700 leading-relaxed'>
+          <div className='bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 leading-relaxed'>
             <ReactMarkdown
               components={{
                 code({ className, children }) {
                   const isBlock = className?.includes('language-');
                   return isBlock ? (
-                    <pre className='bg-gray-950 text-gray-100 p-3 rounded-lg overflow-x-auto my-2 text-xs leading-relaxed'>
+                    <pre className='bg-gray-950 text-gray-100 p-4 rounded-xl overflow-x-auto my-3 text-xs leading-relaxed'>
                       <code>{children}</code>
                     </pre>
                   ) : (
-                    <code className='bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded text-xs'>
+                    <code className='bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded-lg text-xs font-mono'>
                       {children}
                     </code>
                   );

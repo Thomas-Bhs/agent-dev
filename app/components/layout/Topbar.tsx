@@ -1,49 +1,43 @@
-'use client'
+'use client';
 
-import { cn } from '@/app/lib/utils'
-import AgentChip from '../agents/AgentChip'
+import { cn } from '@/app/lib/utils';
+import AgentChip from '../agents/AgentChip';
 
 interface ActiveAgent {
-  name: string
-  color: 'indigo' | 'amber' | 'green' | 'purple' | 'sky'
+  name: string;
+  color: 'indigo' | 'amber' | 'green' | 'purple' | 'sky';
 }
 
 interface TopbarProps {
-  activeAgents: ActiveAgent[]
-  isDark: boolean
-  onThemeToggle: () => void
-  onClear: () => void
+  activeAgents: ActiveAgent[];
+  isDark: boolean;
+  onThemeToggle: () => void;
+  onClear: () => void;
 }
 
-export default function Topbar({
-  activeAgents,
-  isDark,
-  onThemeToggle,
-  onClear,
-}: TopbarProps) {
+export default function Topbar({ activeAgents, isDark, onThemeToggle, onClear }: TopbarProps) {
   return (
-    <div className="h-14 bg-white border-b border-gray-100 px-5 flex items-center justify-between flex-shrink-0">
-
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-gray-900 rounded-lg flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <rect x="1.5" y="1.5" width="4" height="4" rx="1" fill="white"/>
-              <rect x="8.5" y="1.5" width="4" height="4" rx="1" fill="white" fillOpacity="0.5"/>
-              <rect x="1.5" y="8.5" width="4" height="4" rx="1" fill="white" fillOpacity="0.5"/>
-              <rect x="8.5" y="8.5" width="4" height="4" rx="1" fill="white" fillOpacity="0.3"/>
+    <div className='h-14 bg-white border-b border-gray-100 px-6 flex items-center justify-between flex-shrink-0'>
+      <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-2.5'>
+          <div className='w-8 h-8 bg-gray-950 rounded-xl flex items-center justify-center'>
+            <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
+              <rect x='2' y='2' width='5' height='5' rx='1.5' fill='white' />
+              <rect x='9' y='2' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.5' />
+              <rect x='2' y='9' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.5' />
+              <rect x='9' y='9' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.3' />
             </svg>
           </div>
-          <span className="text-sm font-bold text-gray-900 tracking-tight">
-            DevAgent<span className="font-normal text-gray-400">OS</span>
+          <span className='text-sm font-bold text-gray-950 tracking-tight'>
+            DevAgent<span className='font-normal text-gray-400'>OS</span>
           </span>
         </div>
 
-        <div className="w-px h-4 bg-gray-200" />
+        <div className='w-px h-4 bg-gray-200' />
 
-        <div className="flex items-center gap-1.5">
+        <div className='flex items-center gap-1.5'>
           {activeAgents.length === 0 ? (
-            <span className="text-xs text-gray-400">Aucun agent sélectionné</span>
+            <span className='text-xs text-gray-400'>No agent selected</span>
           ) : (
             activeAgents.map((agent) => (
               <AgentChip key={agent.name} name={agent.name} color={agent.color} />
@@ -52,36 +46,38 @@ export default function Topbar({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-          <span className="text-xs text-gray-400">
-            {activeAgents.length} agent{activeAgents.length > 1 ? 's' : ''} actif{activeAgents.length > 1 ? 's' : ''}
+      <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-1.5'>
+          <div className='w-1.5 h-1.5 rounded-full bg-emerald-400' />
+          <span className='text-xs text-gray-400'>
+            {activeAgents.length} active agent{activeAgents.length > 1 ? 's' : ''}
           </span>
         </div>
 
-        <div className="w-px h-4 bg-gray-200" />
+        <div className='w-1.5 h-1.5 rounded-full bg-blue-500' />
 
         <button
           onClick={onThemeToggle}
           className={cn(
-            'w-8 h-4.5 rounded-full relative transition-colors',
-            isDark ? 'bg-indigo-500' : 'bg-gray-200'
+            'w-9 h-5 rounded-full relative transition-colors duration-200',
+            isDark ? 'bg-gray-950' : 'bg-gray-200'
           )}
         >
-          <div className={cn(
-            'w-3.5 h-3.5 bg-white rounded-full absolute top-0.5 transition-transform',
-            isDark ? 'translate-x-4' : 'translate-x-0.5'
-          )} />
+          <div
+            className={cn(
+              'w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform duration-200 shadow-sm',
+              isDark ? 'translate-x-4' : 'translate-x-0.5'
+            )}
+          />
         </button>
 
         <button
           onClick={onClear}
-          className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 px-2.5 py-1 rounded-lg hover:bg-gray-50 transition-colors"
+          className='text-xs text-gray-400 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors'
         >
-          Effacer
+          Clear
         </button>
       </div>
     </div>
-  )
+  );
 }

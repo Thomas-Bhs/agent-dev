@@ -16,34 +16,44 @@ export default function ChatMessages({ messages, isLoading }: ChatMessagesProps)
 
   if (messages.length === 0) {
     return (
-      <div className='flex-1 flex flex-col items-center justify-center gap-3 text-center px-8'>
-        <div className='w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center'>
-          <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-            <path
-              d='M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9z'
-              stroke='#6366f1'
-              strokeWidth='1.5'
-            />
-            <path d='M12 8v4l3 3' stroke='#6366f1' strokeWidth='1.5' strokeLinecap='round' />
+      <div className='flex-1 flex flex-col items-center justify-center gap-4 text-center px-8'>
+        <div className='w-16 h-16 rounded-3xl bg-gray-950 flex items-center justify-center'>
+          <svg width='28' height='28' viewBox='0 0 28 28' fill='none'>
+            <rect x='3' y='3' width='9' height='9' rx='2.5' fill='white' />
+            <rect x='16' y='3' width='9' height='9' rx='2.5' fill='white' fillOpacity='0.5' />
+            <rect x='3' y='16' width='9' height='9' rx='2.5' fill='white' fillOpacity='0.5' />
+            <rect x='16' y='16' width='9' height='9' rx='2.5' fill='white' fillOpacity='0.3' />
           </svg>
         </div>
-        <p className='text-sm font-medium text-gray-700'>Prêt à coder</p>
-        <p className='text-xs text-gray-400 max-w-xs'>
-          Sélectionne un agent et pose ta première question ou uploade un fichier à analyser.
-        </p>
+        <div>
+          <p className='text-sm font-bold text-gray-900 mb-1'>Ready to code</p>
+          <p className='text-xs text-gray-400 max-w-xs leading-relaxed'>
+            Select an agent and ask your first question, or upload a file to analyze.
+          </p>
+        </div>
+        <div className='flex gap-2 flex-wrap justify-center'>
+          {['Create a React hook', 'Debug my code', 'Generate tests'].map((suggestion) => (
+            <button
+              key={suggestion}
+              className='text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-colors'
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className='flex-1 overflow-y-auto px-5 py-5 space-y-4'>
+    <div className='flex-1 overflow-y-auto px-6 py-6 space-y-5'>
       {messages.map((m) => (
         <MessageBubble
           key={m.id}
           role={m.role === 'user' ? 'user' : 'assistant'}
           content={typeof m.content === 'string' ? m.content : ''}
           agentName='Agent Dev'
-          agentColor='bg-indigo-50 text-indigo-600'
+          agentColor='bg-gray-950 text-white'
           toolInvocations={m.toolInvocations?.map((t) => ({
             toolCallId: t.toolCallId,
             toolName: t.toolName,
@@ -53,21 +63,21 @@ export default function ChatMessages({ messages, isLoading }: ChatMessagesProps)
       ))}
 
       {isLoading && (
-        <div className='flex gap-2.5 items-center'>
-          <div className='w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-xs font-bold text-indigo-600'>
+        <div className='flex gap-3 items-center'>
+          <div className='w-8 h-8 rounded-xl bg-gray-950 flex items-center justify-center text-xs font-bold text-white flex-shrink-0'>
             D
           </div>
-          <div className='flex gap-1'>
+          <div className='bg-white border border-gray-100 rounded-2xl px-4 py-3 flex gap-1.5'>
             <div
-              className='w-1.5 h-1.5 rounded-full bg-indigo-300 animate-bounce'
+              className='w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce'
               style={{ animationDelay: '0ms' }}
             />
             <div
-              className='w-1.5 h-1.5 rounded-full bg-indigo-300 animate-bounce'
+              className='w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce'
               style={{ animationDelay: '150ms' }}
             />
             <div
-              className='w-1.5 h-1.5 rounded-full bg-indigo-300 animate-bounce'
+              className='w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce'
               style={{ animationDelay: '300ms' }}
             />
           </div>
