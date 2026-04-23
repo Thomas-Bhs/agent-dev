@@ -30,6 +30,8 @@ interface SidebarProps {
   onAgentSelect: (id: string) => void;
   onConversationSelect: (id: string) => void;
   onNewConversation: () => void;
+  onDeleteConversation: (id: string) => void;
+  onDeleteAllConversations: () => void;
 }
 
 export default function Sidebar({
@@ -40,6 +42,8 @@ export default function Sidebar({
   onAgentSelect,
   onConversationSelect,
   onNewConversation,
+  onDeleteConversation,
+  onDeleteAllConversations,
 }: SidebarProps) {
   return (
     <div className='w-64 bg-white border-r border-gray-100 flex flex-col overflow-hidden flex-shrink-0'>
@@ -78,39 +82,63 @@ export default function Sidebar({
         {conversations.length === 0 ? (
           <p className='text-xs text-gray-400 px-2 py-3'>No conversations yet</p>
         ) : (
-          conversations.map((conv) => (
-            <div
-              key={conv.id}
-              onClick={() => onConversationSelect(conv.id)}
-              className={cn(
-                'px-3 py-2.5 rounded-xl cursor-pointer flex items-center gap-2.5 mb-1 transition-colors',
-                activeConversationId === conv.id ? 'bg-gray-950' : 'hover:bg-gray-50'
-              )}
-            >
+          <>
+            {conversations.map((conv) => (
               <div
-                className='w-1.5 h-1.5 rounded-full flex-shrink-0'
-                style={{ background: conv.agentColor }}
-              />
-              <div className='flex-1 overflow-hidden'>
-                <p
+                key={conv.id}
+                onClick={() => onConversationSelect(conv.id)}
+                className={cn(
+                  'px-3 py-2.5 rounded-xl cursor-pointer flex items-center gap-2 mb-1 transition-colors group',
+                  activeConversationId === conv.id ? 'bg-gray-950' : 'hover:bg-gray-50'
+                )}
+              >
+                <div
+                  className='w-1.5 h-1.5 rounded-full flex-shrink-0'
+                  style={{ background: conv.agentColor }}
+                />
+                <div className='flex-1 overflow-hidden'>
+                  <p
+                    className={cn(
+                      'text-xs truncate font-medium',
+                      activeConversationId === conv.id ? 'text-white' : 'text-gray-700'
+                    )}
+                  >
+                    {conv.title}
+                  </p>
+                  <p className='text-[10px] text-gray-400 mt-0.5'>
+                    {conv.agentName} · {conv.date}
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteConversation(conv.id);
+                  }}
                   className={cn(
-                    'text-xs truncate font-medium',
-                    activeConversationId === conv.id ? 'text-white' : 'text-gray-700'
+                    'opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50',
+                    activeConversationId === conv.id ? 'hover:bg-white/10' : ''
                   )}
                 >
-                  {conv.title}
-                </p>
-                <p
-                  className={cn(
-                    'text-[10px] mt-0.5',
-                    activeConversationId === conv.id ? 'text-gray-400' : 'text-gray-400'
-                  )}
-                >
-                  {conv.agentName} · {conv.date}
-                </p>
+                  <svg width='12' height='12' viewBox='0 0 12 12' fill='none'>
+                    <path
+                      d='M2 3h8M5 3V2h2v1M4 3v6h4V3'
+                      stroke={activeConversationId === conv.id ? 'white' : '#ef4444'}
+                      strokeWidth='1'
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                    />
+                  </svg>
+                </button>
               </div>
-            </div>
-          ))
+            ))}
+
+            <button
+              onClick={onDeleteAllConversations}
+              className='w-full mt-2 text-[10px] text-red-400 hover:text-red-600 py-1.5 hover:bg-red-50 rounded-lg transition-colors'
+            >
+              Clear all conversations
+            </button>
+          </>
         )}
       </div>
     </div>

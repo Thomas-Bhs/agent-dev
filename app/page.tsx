@@ -6,6 +6,7 @@ import Topbar from './components/layout/Topbar';
 import Sidebar from './components/layout/Sidebar';
 import ChatMessages from './components/chat/ChatMessages';
 import ChatInput from './components/chat/ChatInput';
+import SettingsPanel from './components/layout/SettingsPanel';
 
 interface FileContent {
   name: string;
@@ -190,6 +191,7 @@ export default function Home() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState('1');
   const [error, setError] = useState<string | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   //mapping agent id to api route
   const agentRoutes: Record<string, string> = {
@@ -227,36 +229,49 @@ export default function Home() {
     },
   });
 
+  // load conversations from MongoDB on mount
   useEffect(() => {
-    const saved = localStorage.getItem('agent-history');
-    const savedConvs = localStorage.getItem('agent-conversations');
-    if (saved) {
-      try {
-        setMessages(JSON.parse(saved));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    if (savedConvs) {
-      try {
-        setConversations(JSON.parse(savedConvs));
-      } catch (e) {
-        console.error(e);
-      }
-    }
+    fetch('/api/conversations')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setConversations(
+            data.map((c) => ({
+              id: c.conversationId,
+              title: c.title,
+              agentName: c.agentId,
+              agentColor: c.agentColor,
+              date: new Date(c.updatedAt).toLocaleDateString('fr-FR'),
+            }))
+          );
+        }
+      })
+      .catch(console.error);
   }, []);
 
+  //save conversation to MongoDB on messages change
   useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('agent-history', JSON.stringify(messages));
-    }
-  }, [messages]);
+    if (messages.length === 0) return;
 
-  useEffect(() => {
-    if (conversations.length > 0) {
-      localStorage.setItem('agent-conversations', JSON.stringify(conversations));
-    }
-  }, [conversations]);
+    fetch('/api/conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        conversationId: activeConversationId,
+        title: messages[0]?.content?.slice(0, 40) || 'New conversation',
+        agentId: selectedAgentId,
+        agentColor: selectedAgent?.color || '#6366f1',
+        messages: messages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          createdAt: new Date(),
+        })),
+        tokenCount: 0,
+        cost: 0,
+      }),
+    }).catch(console.error);
+  }, [messages]);
 
   const handleClear = () => {
     setMessages([]);
@@ -267,6 +282,24 @@ export default function Home() {
     handleClear();
     setActiveConversationId(Date.now().toString());
     setFileContent(null);
+    setError(null);
+  };
+
+  const handleDeleteConversation = async (id: string) => {
+    console.log('Deleting conversation:', id);
+    const res = await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    console.log('Delete result:', data);
+    setConversations((prev) => prev.filter((c) => c.id !== id));
+    if (activeConversationId === id) {
+      handleNewConversation();
+    }
+  };
+
+  const handleDeleteAllConversations = async () => {
+    await fetch('/api/conversations', { method: 'DELETE' });
+    setConversations([]);
+    handleNewConversation();
   };
 
   const selectedAgent = AGENTS.find((a) => a.id === selectedAgentId);
@@ -287,6 +320,7 @@ export default function Home() {
         isDark={isDark}
         onThemeToggle={() => setIsDark(!isDark)}
         onClear={handleClear}
+        onSettings={() => setIsSettingsOpen(true)}
       />
 
       <div className='flex flex-1 overflow-hidden'>
@@ -299,8 +333,17 @@ export default function Home() {
             setSelectedAgentId(id);
             handleClear();
           }}
-          onConversationSelect={(id) => setActiveConversationId(id)}
+          onConversationSelect={async (id) => {
+            setActiveConversationId(id);
+            const res = await fetch(`/api/conversations/${id}`);
+            const data = await res.json();
+            if (data?.messages) {
+              setMessages(data.messages);
+            }
+          }}
           onNewConversation={handleNewConversation}
+          onDeleteConversation={handleDeleteConversation}
+          onDeleteAllConversations={handleDeleteAllConversations}
         />
 
         <div className='flex flex-col flex-1 overflow-hidden bg-[#f5f5f7]'>
@@ -328,6 +371,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

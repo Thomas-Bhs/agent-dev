@@ -2,6 +2,7 @@
 
 import { cn } from '@/app/lib/utils';
 import AgentChip from '../agents/AgentChip';
+import { Gauge } from 'lucide-react';
 
 interface ActiveAgent {
   name: string;
@@ -13,9 +14,16 @@ interface TopbarProps {
   isDark: boolean;
   onThemeToggle: () => void;
   onClear: () => void;
+  onSettings: () => void;
 }
 
-export default function Topbar({ activeAgents, isDark, onThemeToggle, onClear }: TopbarProps) {
+export default function Topbar({
+  activeAgents,
+  isDark,
+  onThemeToggle,
+  onClear,
+  onSettings,
+}: TopbarProps) {
   return (
     <div className='h-14 bg-white border-b border-gray-100 px-6 flex items-center justify-between flex-shrink-0'>
       <div className='flex items-center gap-4'>
@@ -47,14 +55,12 @@ export default function Topbar({ activeAgents, isDark, onThemeToggle, onClear }:
       </div>
 
       <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
-          <div className='w-1.5 h-1.5 rounded-full bg-emerald-400' />
-          <span className='text-xs text-gray-400'>
-            {activeAgents.length} active agent{activeAgents.length > 1 ? 's' : ''}
-          </span>
-        </div>
-
-        <div className='w-1.5 h-1.5 rounded-full bg-blue-500' />
+        <button
+          onClick={onSettings}
+          className='w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors'
+        >
+          <Gauge size={15} color='#9ca3af' />
+        </button>
 
         <button
           onClick={onThemeToggle}
