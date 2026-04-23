@@ -157,9 +157,9 @@ const AGENTS = [
     name: 'Orchestrator',
     description: 'Coordinates agents',
     iconBg: '#e0f2fe',
-    badge: 'soon' as const,
+    badge: 'active' as const,
     color: '#0284c7',
-    isDisabled: true,
+    isDisabled: false,
     icon: (
       <svg width='18' height='18' viewBox='0 0 18 18' fill='none'>
         <circle cx='9' cy='4' r='2' stroke='#0284c7' strokeWidth='1.5' />
@@ -180,6 +180,7 @@ const agentChipColors: Record<string, 'indigo' | 'amber' | 'green' | 'purple' | 
   dev: 'indigo',
   debug: 'amber',
   qa: 'purple',
+  orchestrator: 'sky',
 };
 
 export default function Home() {
@@ -195,6 +196,7 @@ export default function Home() {
     dev: '/api/agents/dev',
     debug: '/api/agents/debug',
     qa: '/api/agents/qa',
+    orchestrator: '/api/agents/orchestrator',
   };
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
