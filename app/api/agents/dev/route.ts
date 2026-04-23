@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { tavily } from '@tavily/core';
 import { Client } from 'langsmith';
 import { traceable } from 'langsmith/traceable';
+import { trackTokens, calculateCost } from '@/app/lib/db/tokens';
 
 const anthropic = createAnthropic();
 const langsmithClient = new Client({
@@ -138,7 +139,23 @@ export const POST = traceable(
         },
       });
 
-      return result.toDataStreamResponse();
+      const response = result.toDataStreamResponse();
+
+      result.usage.then((usage) => {
+        if (usage) {
+          trackTokens({
+            agent: 'dev',
+            model: 'claude-sonnet-4-5',
+            promptTokens: usage.promptTokens,
+            completionTokens: usage.completionTokens,
+            totalTokens: usage.totalTokens,
+            cost: calculateCost('claude-sonnet-4-5', usage.promptTokens, usage.completionTokens),
+            conversationId: 'unknown',
+          }).catch(console.error);
+        }
+      });
+
+      return response;
     } catch (error) {
       console.error('Agent error:', error);
       return new Response(JSON.stringify({ error: String(error) }), {

@@ -3,6 +3,7 @@ import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import { Client } from 'langsmith';
 import { traceable } from 'langsmith/traceable';
+import { trackTokens, calculateCost } from '@/app/lib/db/tokens';
 
 const anthropic = createAnthropic();
 const langsmithClient = new Client({
@@ -44,7 +45,7 @@ export const POST = traceable(
 
       const result = streamText({
         model: anthropic('claude-sonnet-4-5'),
-        system:  `Tu es l'orchestrateur de 3 agents spécialisés :
+        system: `Tu es l'orchestrateur de 3 agents spécialisés :
         - Agent DEV (/api/agents/dev) : code, composants, hooks, architecture
         - Agent DEBUG (/api/agents/debug) : erreurs, bugs, performance
         - Agent QA (/api/agents/qa) : tests, couverture, qualité
@@ -125,7 +126,23 @@ export const POST = traceable(
         },
       });
 
-      return result.toDataStreamResponse();
+      const response = result.toDataStreamResponse();
+
+      result.usage.then((usage) => {
+        if (usage) {
+          trackTokens({
+            agent: 'orchestrator',
+            model: 'claude-sonnet-4-5',
+            promptTokens: usage.promptTokens,
+            completionTokens: usage.completionTokens,
+            totalTokens: usage.totalTokens,
+            cost: calculateCost('claude-sonnet-4-5', usage.promptTokens, usage.completionTokens),
+            conversationId: 'unknown',
+          }).catch(console.error);
+        }
+      });
+
+      return response;
     } catch (error) {
       console.error('Orchestrator error:', error);
       return new Response(JSON.stringify({ error: String(error) }), {
