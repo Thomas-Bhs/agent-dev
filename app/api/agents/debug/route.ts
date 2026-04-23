@@ -16,20 +16,15 @@ export const POST = traceable(
     try {
       const { messages, fileContent } = await req.json();
 
-      const baseSystem = `Tu es un agent expert en debugging et résolution de bugs pour les applications web et mobile (React, Next.js, React Native, Node.js, TypeScript).
+      const trimmedMessages = messages.slice(-6);
 
-      Ton rôle :
-      - Identifier la cause racine des erreurs et bugs
-      - Proposer des solutions précises et testées
-      - Expliquer pourquoi le bug se produit
-      - Prévenir les bugs similaires à l'avenir
+      const baseSystem = `Tu es un expert en debugging React, Next.js, React Native, TypeScript.
 
-      Règles IMPORTANTES :
-      - Toujours identifier la cause racine avant de proposer une solution
-      - Donner du code corrigé et fonctionnel
-      - Expliquer la différence entre le code bugué et le code corrigé
+      Règles :
+      - Identifier la cause racine avant de proposer une solution
+      - Code corrigé obligatoire avec explication de la différence
       - Mentionner les edge cases potentiels
-      - Utiliser des blocs de code markdown avec le langage spécifié ex: \`\`\`typescript`;
+      - Blocs markdown avec langage spécifié ex: \`\`\`typescript`;
 
       const system = fileContent
         ? `${baseSystem}\n\nFichier attaché (${fileContent.name}):\n\`\`\`\n${fileContent.content}\n\`\`\``
@@ -38,8 +33,9 @@ export const POST = traceable(
       const result = streamText({
         model: anthropic('claude-sonnet-4-5'),
         system,
-        messages,
+        messages: trimmedMessages,
         maxSteps: 3,
+        maxTokens: 1000,
         onError: (error) => console.error('Debug agent error:', JSON.stringify(error)),
         tools: {
           analyzeError: tool({

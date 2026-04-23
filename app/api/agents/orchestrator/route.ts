@@ -9,7 +9,7 @@ const langsmithClient = new Client({
   apiKey: process.env.LANGSMITH_API_KEY,
 });
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
@@ -40,34 +40,26 @@ export const POST = traceable(
     try {
       const { messages } = await req.json();
 
+      const trimmedMessages = messages.slice(-6);
+
       const result = streamText({
         model: anthropic('claude-sonnet-4-5'),
-        system: `Tu es l'orchestrateur d'un système multi-agents de développement.
+        system:  `Tu es l'orchestrateur de 3 agents spécialisés :
+        - Agent DEV (/api/agents/dev) : code, composants, hooks, architecture
+        - Agent DEBUG (/api/agents/debug) : erreurs, bugs, performance
+        - Agent QA (/api/agents/qa) : tests, couverture, qualité
 
-Tu coordonnes 3 agents spécialisés :
-- Agent DEV (/api/agents/dev) : création de code, composants React/RN, hooks, architecture
-- Agent DEBUG (/api/agents/debug) : analyse d'erreurs, correction de bugs, performance
-- Agent QA (/api/agents/qa) : génération de tests, couverture, stratégie qualité
+        Délégation :
+        - "erreur/bug/crash/undefined/TypeError" → DEBUG
+        - "test/jest/coverage/spec" → QA
+        - "crée/génère/hook/composant/structure" → DEV
+        - Tâches complexes → DEV puis DEBUG puis QA
 
-Ton rôle :
-- Analyser la demande de l'utilisateur
-- Décider quel(s) agent(s) sont les mieux placés
-- Déléguer et orchestrer les réponses
-- Pour les tâches complexes, utiliser plusieurs agents en séquence
+        Après chaque tool : afficher le résultat complet avec sections ## Agent Dev / ## Agent Debug / ## Agent QA`,
 
-Règles de délégation :
-- Mots clés "erreur", "bug", "crash", "undefined", "TypeError" → Agent DEBUG
-- Mots clés "test", "jest", "coverage", "spec" → Agent QA
-- Mots clés "crée", "génère", "hook", "composant", "structure" → Agent DEV
-- Tâches complexes → DEV puis DEBUG puis QA en séquence
-
-IMPORTANT — Après avoir utilisé un tool :
-- Affiche TOUJOURS le résultat complet de chaque agent
-- Structure ta réponse avec des sections claires : "## Agent Dev", "## Agent Debug", "## Agent QA"
-- Ne résume pas — montre le vrai code et les vraies réponses de chaque agent`,
-
-        messages,
+        messages: trimmedMessages,
         maxSteps: 5,
+        maxTokens: 2000,
         onError: (error) => console.error('Orchestrator error:', JSON.stringify(error)),
         tools: {
           delegateToAgent: tool({
