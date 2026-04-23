@@ -6,7 +6,7 @@ import { qaQuestions } from './datasets/qa';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const BASE_URL = process.env.EVAL_URL || 'http://localhost:3000';
-const MODEL = process.env.EVAL_MODEL || 'llama-3.3-70b-versatile';
+const MODEL = process.env.EVAL_MODEL || 'claude-sonnet-4-5';
 
 const agentConfig = [
   {
@@ -32,7 +32,7 @@ const agentConfig = [
 async function askAgent(route: string, question: string): Promise<string> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
+    const timeout = setTimeout(() => controller.abort(), 45000);
 
     const res = await fetch(`${BASE_URL}${route}`, {
       method: 'POST',

@@ -1,0 +1,22 @@
+{
+  "model": "claude-sonnet-4-5",
+  "date": "2026-04-23T05:55:59.165Z",
+  "globalAvg": "2.90",
+  "agents": [
+    {
+      "agent": "dev",
+      "avgScore": "2.70",
+      "totalScore": 27
+    },
+    {
+      "agent": "debug",
+      "avgScore": "3.00",
+      "totalScore": 30
+    },
+    {
+      "agent": "qa",
+      "avgScore": "3.00",
+      "totalScore": 30
+    }
+  ]
+}
