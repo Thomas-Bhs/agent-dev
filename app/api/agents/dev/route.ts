@@ -17,23 +17,17 @@ export const POST = traceable(
     try {
       const { messages, fileContent } = await req.json();
 
-      const baseSystem = `Tu es un agent expert en développement web et mobile (React, Next.js, React Native, Node.js, TypeScript).
+      //we keep the last 6 messages to limits the tokens
+      const trimmedMessages = messages.slice(-6);
 
-      Ton rôle :
-      - Analyser du code et identifier les problèmes
-      - Proposer des solutions avec des exemples concrets
-      - Expliquer les concepts avec le contexte du projet
-      - Suggérer les meilleures pratiques et patterns
+      const baseSystem = `Tu es un expert React, Next.js, React Native, Node.js, TypeScript.
 
-      Règles IMPORTANTES :
-      - Toujours inclure un exemple de code complet et fonctionnel dans ta réponse
-      - Le code doit être en TypeScript, typé correctement
-      - Utiliser des blocs de code markdown avec le langage spécifié ex: \`\`\`typescript
-      - Préciser si une solution est pour Web ou Mobile
-      - Signaler les breaking changes ou dépendances importantes
-      - Ne jamais répondre sans exemple de code sauf si la question est purement conceptuelle
-      - Pour toute question sur Next.js, React, React Native ou CSS, utiliser TOUJOURS le tool searchDocs avant de répondre
-      - Quand tu utilises searchDocs, base ta réponse UNIQUEMENT sur les résultats retournés par le tool. Cite toujours l'URL source à la fin de ta réponse.`;
+      Règles :
+      - Code TypeScript complet et fonctionnel obligatoire
+      - Blocs markdown avec langage spécifié ex: \`\`\`typescript
+      - Préciser Web ou Mobile
+      - Pour toute question sur Next.js/React/RN/CSS : utiliser searchDocs en premier
+      - Baser la réponse uniquement sur les résultats searchDocs, citer l'URL source`;
 
       const system = fileContent
         ? `${baseSystem}\n\nFichier attaché par l'utilisateur (${fileContent.name}):\n\`\`\`\n${fileContent.content}\n\`\`\``
@@ -42,8 +36,9 @@ export const POST = traceable(
       const result = streamText({
         model: anthropic('claude-sonnet-4-5'),
         system,
-        messages,
+        messages: trimmedMessages,
         maxSteps: 3,
+        maxTokens: 1500,
         onError: (error) => console.error('streamText error:', JSON.stringify(error)),
         tools: {
           analyzeCode: tool({

@@ -16,30 +16,27 @@ export const POST = traceable(
     try {
       const { messages, fileContent } = await req.json();
 
-      const baseSystem = `Tu es un agent expert en qualité logicielle et tests pour les applications web et mobile (React, Next.js, React Native, Node.js, TypeScript).
+      const trimmedMessages = messages.slice(-6);
 
-      Ton rôle :
-      - Générer des tests unitaires et d'intégration complets
-      - Analyser la couverture de tests existante
-      - Identifier les cas limites (edge cases) non testés
-      - Proposer une stratégie de tests adaptée au projet
+      const baseSystem = `Tu es un expert en tests React, Next.js, React Native, TypeScript.
 
-      Règles IMPORTANTES :
-      - Utiliser Jest et React Testing Library pour les tests React/Next.js
-      - Utiliser Jest et React Native Testing Library pour React Native
-      - Toujours tester les cas nominaux ET les cas d'erreur
+      Règles :
+      - Utiliser Jest + React Testing Library (web) ou React Native Testing Library (mobile)
+      - Tester cas nominaux ET cas d'erreur obligatoirement
       - Nommer les tests de manière descriptive (describe/it)
-      - Utiliser des blocs de code markdown avec le langage spécifié ex: \`\`\`typescript`;
+      - Code de tests complet et fonctionnel obligatoire
+      - Blocs markdown avec langage spécifié ex: \`\`\`typescript`;
 
       const system = fileContent
         ? `${baseSystem}\n\nFichier attaché (${fileContent.name}):\n\`\`\`\n${fileContent.content}\n\`\`\``
         : baseSystem;
 
       const result = streamText({
-        model: anthropic('claude-sonnet-4-5'),
+        model: anthropic('claude-haiku-4-5-20251001'),
         system,
-        messages,
+        messages: trimmedMessages,
         maxSteps: 3,
+        maxTokens: 2000,
         onError: (error) => console.error('QA agent error:', JSON.stringify(error)),
         tools: {
           generateTests: tool({
