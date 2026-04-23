@@ -1,10 +1,10 @@
-import { createGroq } from '@ai-sdk/groq';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import { Client } from 'langsmith';
 import { traceable } from 'langsmith/traceable';
 
-const groq = createGroq();
+const anthropic = createAnthropic();
 const langsmithClient = new Client({
   apiKey: process.env.LANGSMITH_API_KEY,
 });
@@ -41,7 +41,7 @@ export const POST = traceable(
       const { messages } = await req.json();
 
       const result = streamText({
-        model: groq('llama-3.3-70b-versatile'),
+        model: anthropic('claude-sonnet-4-5'),
         system: `Tu es l'orchestrateur d'un système multi-agents de développement.
 
 Tu coordonnes 3 agents spécialisés :

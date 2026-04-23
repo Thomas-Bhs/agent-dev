@@ -1,16 +1,16 @@
-import { createGroq } from '@ai-sdk/groq';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { streamText, tool } from 'ai';
 import { z } from 'zod';
 import { tavily } from '@tavily/core';
 import { Client } from 'langsmith';
 import { traceable } from 'langsmith/traceable';
 
-const groq = createGroq();
+const anthropic = createAnthropic();
 const langsmithClient = new Client({
   apiKey: process.env.LANGSMITH_API_KEY,
 });
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 export const POST = traceable(
   async (req: Request) => {
@@ -40,7 +40,7 @@ export const POST = traceable(
         : baseSystem;
 
       const result = streamText({
-        model: groq('llama-3.3-70b-versatile'),
+        model: anthropic('claude-sonnet-4-5'),
         system,
         messages,
         maxSteps: 3,

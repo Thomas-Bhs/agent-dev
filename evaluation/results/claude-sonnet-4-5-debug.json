@@ -1,0 +1,89 @@
+{
+  "agent": "debug",
+  "model": "claude-sonnet-4-5",
+  "date": "2026-04-23T05:50:16.820Z",
+  "avgScore": "3.00",
+  "totalScore": 30,
+  "results": [
+    {
+      "id": "DEBUG-Q1",
+      "question": "J'ai cette erreur : Cannot read properties of undefined (reading 'map'). Mon code : const items = data.items.map(item => item.name)",
+      "expectedTool": "analyzeError",
+      "response": "## 🐛 Analyse du bug\n\n**Cause racine :** `data.items` est `undefined`, ce qui signifie que :\n- Soit `data` est un objet mais n'a pas de propriété `items`\n- Soit `data.items` n'a pas encore été initialisé (appel API en cours)\n- Soit la structure de données reçue est différente de celle attendue\n\n---\n\n## ✅ Solutions\n\n### **Solution 1 : Vérification avec Optional Chaining + Fallback**\n```typescript\nconst items = data?.items?.map(item => item.name) || [];\n```\n\n### **Solution 2 : Vérification explici",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code, des explications détaillées et des recommandations pour différents cas d'utilisation."
+    },
+    {
+      "id": "DEBUG-Q2",
+      "question": "Pourquoi ce code cause une fuite mémoire ? useEffect(() => { const interval = setInterval(() => setCount(c => c + 1), 1000) }, [])",
+      "expectedTool": "analyzeError",
+      "response": "## 🐛 Cause racine de la fuite mémoire\n\nLe problème est que **l'interval n'est jamais nettoyé** quand le composant se démonte. Voici ce qui se passe :\n\n1. ✅ Le `setInterval` démarre quand le composant monte\n2. ❌ Quand le composant se démonte, l'interval **continue de tourner en arrière-plan**\n3. ❌ L'interval essaie d'appeler `setCount` sur un composant qui n'existe plus\n4. 💥 Résultat : **fuite mémoire** + warning React \"Can't perform a React state update on an unmounted component\"\n\n---\n\n## ✅ Co",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées sur la cause de la fuite mémoire et la correction."
+    },
+    {
+      "id": "DEBUG-Q3",
+      "question": "Mon composant React re-render à l'infini, voici le code : const [user, setUser] = useState({}); useEffect(() => { setUser({ name: 'John' }) }, [user])",
+      "expectedTool": "analyzeError",
+      "response": "## 🐛 Cause racine du bug\n\nVous avez une **boucle infinie** classique ! Voici ce qui se passe :\n\n1. Le composant monte → `useEffect` s'exécute\n2. `setUser({ name: 'John' })` est appelé → crée un **nouvel objet**\n3. `user` change → le composant re-render\n4. `useEffect` détecte que `user` a changé (nouvelle référence d'objet)\n5. `useEffect` se ré-exécute → retour à l'étape 2 ♾️\n\n**Pourquoi ?** À chaque appel de `setUser({ name: 'John' })`, un **nouvel objet** est créé en mémoire. React compare les",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées pour chaque solution."
+    },
+    {
+      "id": "DEBUG-Q4",
+      "question": "J'ai une erreur 'Maximum update depth exceeded' dans React, comment la corriger ?",
+      "expectedTool": "suggestFix",
+      "response": "## 🔍 Analyse de l'erreur \"Maximum update depth exceeded\"\n\nCette erreur se produit quand React détecte une **boucle infinie de mises à jour d'état**. Voici les causes les plus fréquentes :\n\n---\n\n## 🚨 Causes principales\n\n### 1. **Appel de setState directement dans le render**\n```typescript\n// ❌ MAUVAIS - Cause une boucle infinie\nfunction MyComponent() {\n  const [count, setCount] = useState(0);\n  \n  setCount(count + 1); // ❌ Appelé à chaque render !\n  \n  return <div>{count}</div>;\n}\n```\n\n**✅ Solu",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées pour chaque cas de figure."
+    },
+    {
+      "id": "DEBUG-Q5",
+      "question": "Mon appel API retourne 401 Unauthorized alors que mon token est correct, que vérifier ?",
+      "expectedTool": "analyzeError",
+      "response": "## 🔍 Analyse du problème 401 Unauthorized\n\nVoici une checklist complète des points à vérifier quand vous avez une erreur 401 malgré un token \"correct\" :\n\n### **1. Format du header Authorization**\n\n```typescript\n// ❌ INCORRECT\nheaders: {\n  'Authorization': 'your-token-here'\n}\n\n// ✅ CORRECT - Bearer token\nheaders: {\n  'Authorization': 'Bearer your-token-here'\n}\n\n// ✅ CORRECT - API Key (selon votre API)\nheaders: {\n  'Authorization': 'ApiKey your-token-here'\n}\n```\n\n### **2. Token expiré**\n\n```types",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et une checklist détaillée pour résoudre le problème 401 Unauthorized."
+    },
+    {
+      "id": "DEBUG-Q6",
+      "question": "Comment déboguer un problème de performance dans un composant React qui re-render trop souvent ?",
+      "expectedTool": "checkPerformance",
+      "response": "Je vais vous aider à déboguer ce problème de performance. Pour analyser efficacement votre situation, j'aurais besoin de voir le code du composant concerné. Mais je peux déjà vous donner une approche complète pour identifier et résoudre les re-renders excessifs.\n\n## 🔍 Méthodologie de débogage des re-renders\n\n### 1. **Identifier les re-renders**\n\nAjoutez d'abord des logs pour détecter les re-renders :\n\n```typescript\nimport { useEffect, useRef } from 'react';\n\nfunction MyComponent(props) {\n  cons",
+      "score": 3,
+      "reason": "La réponse est complète et fournit une approche détaillée pour déboguer les re-renders excessifs dans un composant React, y compris des exemples de code et des conseils pour les causes communes des re-renders."
+    },
+    {
+      "id": "DEBUG-Q7",
+      "question": "J'ai cette erreur TypeScript : Type 'string | undefined' is not assignable to type 'string'. Comment corriger ?",
+      "expectedTool": "suggestFix",
+      "response": "## 🔍 Analyse de l'erreur\n\nCette erreur TypeScript se produit lorsque vous essayez d'assigner une valeur qui peut être `undefined` à une variable qui attend strictement un `string`.\n\n## 🛠️ Solutions selon le contexte\n\n### **Solution 1 : Vérification avec condition (Recommandé)**\n\n```typescript\n// ❌ Avant (avec erreur)\nconst name: string = user.name; // user.name est string | undefined\n\n// ✅ Après\nconst name: string = user.name ?? 'Valeur par défaut';\n// ou\nconst name: string = user.name || 'Val",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées sur les différentes solutions possibles."
+    },
+    {
+      "id": "DEBUG-Q8",
+      "question": "Mon useEffect se déclenche en boucle infinie avec un objet en dépendance, comment corriger ?",
+      "expectedTool": "analyzeError",
+      "response": "## 🔍 Cause racine du problème\n\nLe problème de **boucle infinie** avec un objet en dépendance dans `useEffect` se produit parce que :\n\n1. **React compare les dépendances par référence** (avec `Object.is()`)\n2. **Les objets sont recréés à chaque render** avec une nouvelle référence\n3. Nouvelle référence → useEffect se déclenche → potentiellement nouveau render → nouvel objet → boucle infinie\n\n## ✅ Solutions selon votre cas\n\n### **Solution 1 : Utiliser `useMemo` pour mémoriser l'objet**\n\n```typesc",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées sur les différentes solutions possibles pour résoudre le problème de boucle infinie avec un objet en dépendance dans `useEffect`."
+    },
+    {
+      "id": "DEBUG-Q9",
+      "question": "Analyse ce code qui cause des re-renders inutiles : const config = { timeout: 3000 }; useEffect(() => { fetch('/api', config) }, [config])",
+      "expectedTool": "checkPerformance",
+      "response": "## 🐛 Analyse du Bug\n\n### **Cause Racine**\nL'objet `config` est **recréé à chaque render** du composant. En JavaScript, `{ timeout: 3000 } !== { timeout: 3000 }` car ce sont deux références différentes en mémoire. React compare les dépendances par référence, donc `useEffect` détecte un changement à chaque render et se ré-exécute infiniment.\n\n### **Problème de Performance**\n- ♻️ **Re-render infini** : Le useEffect s'exécute à chaque render\n- 🌐 **Appels API multiples** : Fetch est appelé en boucl",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées sur les causes et les solutions au problème de re-renders inutiles."
+    },
+    {
+      "id": "DEBUG-Q10",
+      "question": "J'ai une erreur CORS sur mon API Next.js, comment la résoudre ?",
+      "expectedTool": "suggestFix",
+      "response": "## 🔍 Analyse de l'erreur CORS\n\nLes erreurs CORS (Cross-Origin Resource Sharing) sur Next.js se produisent quand votre frontend essaie d'accéder à votre API depuis une origine différente (domaine, port ou protocole différent).\n\n## 🎯 Solutions selon votre version de Next.js\n\n### **Solution 1 : Next.js 13+ (App Router) - Middleware**\n\nCréez un fichier `middleware.ts` à la racine de votre projet :\n\n```typescript\n// middleware.ts\nimport { NextResponse } from 'next/server'\nimport type { NextRequest ",
+      "score": 3,
+      "reason": "La réponse est complète avec des exemples de code et des explications détaillées pour chaque solution."
+    }
+  ]
+}
