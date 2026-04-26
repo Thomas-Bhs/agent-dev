@@ -7,6 +7,8 @@ import Sidebar from './components/layout/Sidebar';
 import ChatMessages from './components/chat/ChatMessages';
 import ChatInput from './components/chat/ChatInput';
 import SettingsPanel from './components/layout/SettingsPanel';
+import type { Theme } from './lib/theme';
+import { themes } from './lib/theme';
 
 interface FileContent {
   name: string;
@@ -187,7 +189,8 @@ const agentChipColors: Record<string, 'indigo' | 'amber' | 'green' | 'purple' | 
 export default function Home() {
   const [selectedAgentId, setSelectedAgentId] = useState('dev');
   const [fileContent, setFileContent] = useState<FileContent | null>(null);
-  const [isDark, setIsDark] = useState(false);
+  //const [isDark, setIsDark] = useState(false);
+  const [theme, setTheme] = useState<Theme>('spatial');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState('1');
   const [error, setError] = useState<string | null>(null);
@@ -278,6 +281,15 @@ export default function Home() {
     localStorage.removeItem('agent-history');
   };
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    if (savedTheme) setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   const handleNewConversation = () => {
     handleClear();
     setActiveConversationId(Date.now().toString());
@@ -304,8 +316,11 @@ export default function Home() {
 
   const selectedAgent = AGENTS.find((a) => a.id === selectedAgentId);
 
+  const currentTheme = themes[theme];
+  const isFallout = theme === 'fallout';
+
   return (
-    <div className='flex flex-col h-screen bg-[#f5f5f7]'>
+    <div className='flex flex-col h-screen' style={{ background: currentTheme.bg }}>
       <Topbar
         activeAgents={
           selectedAgent
@@ -317,10 +332,11 @@ export default function Home() {
               ]
             : []
         }
-        isDark={isDark}
-        onThemeToggle={() => setIsDark(!isDark)}
+        isDark={isFallout}
+        onThemeToggle={() => setTheme(isFallout ? 'spatial' : 'fallout')}
         onClear={handleClear}
         onSettings={() => setIsSettingsOpen(true)}
+        theme={theme}
       />
 
       <div className='flex flex-1 overflow-hidden'>
@@ -337,24 +353,32 @@ export default function Home() {
             setActiveConversationId(id);
             const res = await fetch(`/api/conversations/${id}`);
             const data = await res.json();
-            if (data?.messages) {
-              setMessages(data.messages);
-            }
+            if (data?.messages) setMessages(data.messages);
           }}
           onNewConversation={handleNewConversation}
           onDeleteConversation={handleDeleteConversation}
           onDeleteAllConversations={handleDeleteAllConversations}
+          theme={theme}
         />
 
-        <div className='flex flex-col flex-1 overflow-hidden bg-[#f5f5f7]'>
-          <div className='flex-1 overflow-hidden flex flex-col mx-4 my-4 bg-white rounded-3xl border border-gray-200/80 shadow-sm'>
-            <ChatMessages messages={messages} isLoading={isLoading} />
+        <div
+          className='flex flex-col flex-1 overflow-hidden'
+          style={{ background: currentTheme.bg }}
+        >
+          <div
+            className='flex-1 overflow-hidden flex flex-col mx-4 my-4 rounded-3xl shadow-sm'
+            style={{
+              background: currentTheme.surface,
+              border: `1px solid ${currentTheme.border}`,
+            }}
+          >
+            <ChatMessages messages={messages} isLoading={isLoading} theme={theme} />
             {error && (
               <div className='mx-4 mb-3 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-between'>
                 <p className='text-xs text-red-500'>{error}</p>
                 <button
                   onClick={() => setError(null)}
-                  className='text-red-300 hover:text-red-500 text-sm ml-3 transition-colors'
+                  className='text-red-300 hover:text-red-500 text-sm ml-3'
                 >
                   ×
                 </button>
@@ -367,6 +391,7 @@ export default function Home() {
               onInputChange={handleInputChange}
               onSubmit={handleSubmit}
               onFileChange={setFileContent}
+              theme={theme}
             />
           </div>
         </div>

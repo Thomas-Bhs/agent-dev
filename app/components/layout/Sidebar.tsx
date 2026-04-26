@@ -2,6 +2,8 @@
 
 import { cn } from '@/app/lib/utils';
 import AgentCard from '../agents/AgentCard';
+import type { Theme } from '@/app/lib/theme';
+import { themes } from '@/app/lib/theme';
 
 interface Conversation {
   id: string;
@@ -32,6 +34,7 @@ interface SidebarProps {
   onNewConversation: () => void;
   onDeleteConversation: (id: string) => void;
   onDeleteAllConversations: () => void;
+  theme: Theme;
 }
 
 export default function Sidebar({
@@ -44,11 +47,26 @@ export default function Sidebar({
   onNewConversation,
   onDeleteConversation,
   onDeleteAllConversations,
+  theme,
 }: SidebarProps) {
+  const t = themes[theme];
+  const isFallout = theme === 'fallout';
+
   return (
-    <div className='w-64 bg-white border-r border-gray-100 flex flex-col overflow-hidden flex-shrink-0'>
+    <div
+      className='w-64 flex flex-col overflow-hidden flex-shrink-0'
+      style={{
+        background: t.surface,
+        borderRight: `1px solid ${t.border}`,
+      }}
+    >
       <div className='px-4 pt-4 pb-2'>
-        <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3'>Agents</p>
+        <p
+          className='text-[10px] font-bold uppercase tracking-widest mb-3'
+          style={{ color: isFallout ? t.border : '#9ca3af' }}
+        >
+          {isFallout ? '// AGENTS' : 'Agents'}
+        </p>
         <div className='grid grid-cols-2 gap-2'>
           {agents.map((agent) => (
             <AgentCard
@@ -61,18 +79,29 @@ export default function Sidebar({
               isSelected={selectedAgentId === agent.id}
               isDisabled={agent.isDisabled}
               onClick={() => onAgentSelect(agent.id)}
+              theme={theme}
+              agentId={agent.id}
             />
           ))}
         </div>
       </div>
 
-      <div className='mx-4 my-3 h-px bg-gray-100' />
+      <div className='mx-4 my-3 h-px' style={{ background: t.border }} />
 
       <div className='px-4 flex items-center justify-between mb-2'>
-        <p className='text-[10px] font-bold text-gray-400 uppercase tracking-widest'>History</p>
+        <p
+          className='text-[10px] font-bold uppercase tracking-widest'
+          style={{ color: isFallout ? t.border : '#9ca3af' }}
+        >
+          {isFallout ? '// HISTORY' : 'History'}
+        </p>
         <button
           onClick={onNewConversation}
-          className='text-[10px] font-semibold bg-gray-950 text-white px-2.5 py-1 rounded-lg hover:bg-gray-800 transition-colors'
+          className='text-[10px] font-semibold px-2.5 py-1 rounded-lg transition-colors'
+          style={{
+            background: isFallout ? t.border : '#0f0f1a',
+            color: isFallout ? t.bg : 'white',
+          }}
         >
           + New
         </button>
@@ -80,32 +109,48 @@ export default function Sidebar({
 
       <div className='flex-1 overflow-y-auto px-2'>
         {conversations.length === 0 ? (
-          <p className='text-xs text-gray-400 px-2 py-3'>No conversations yet</p>
+          <p className='text-xs px-2 py-3' style={{ color: t.textSecondary }}>
+            {isFallout ? '> No logs found_' : 'No conversations yet'}
+          </p>
         ) : (
           <>
             {conversations.map((conv) => (
               <div
                 key={conv.id}
                 onClick={() => onConversationSelect(conv.id)}
-                className={cn(
-                  'px-3 py-2.5 rounded-xl cursor-pointer flex items-center gap-2 mb-1 transition-colors group',
-                  activeConversationId === conv.id ? 'bg-gray-950' : 'hover:bg-gray-50'
-                )}
+                className='px-3 py-2.5 rounded-xl cursor-pointer flex items-center gap-2 mb-1 transition-colors group'
+                style={{
+                  background:
+                    activeConversationId === conv.id
+                      ? isFallout
+                        ? `${t.border}22`
+                        : '#0f0f1a'
+                      : 'transparent',
+                  border:
+                    activeConversationId === conv.id && isFallout
+                      ? `1px solid ${t.border}`
+                      : '1px solid transparent',
+                }}
               >
                 <div
                   className='w-1.5 h-1.5 rounded-full flex-shrink-0'
-                  style={{ background: conv.agentColor }}
+                  style={{ background: isFallout ? t.border : conv.agentColor }}
                 />
                 <div className='flex-1 overflow-hidden'>
                   <p
-                    className={cn(
-                      'text-xs truncate font-medium',
-                      activeConversationId === conv.id ? 'text-white' : 'text-gray-700'
-                    )}
+                    className='text-xs truncate font-medium'
+                    style={{
+                      color:
+                        activeConversationId === conv.id
+                          ? isFallout
+                            ? t.border
+                            : 'white'
+                          : t.text,
+                    }}
                   >
                     {conv.title}
                   </p>
-                  <p className='text-[10px] text-gray-400 mt-0.5'>
+                  <p className='text-[10px] mt-0.5' style={{ color: t.textSecondary }}>
                     {conv.agentName} · {conv.date}
                   </p>
                 </div>
@@ -114,15 +159,12 @@ export default function Sidebar({
                     e.stopPropagation();
                     onDeleteConversation(conv.id);
                   }}
-                  className={cn(
-                    'opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50',
-                    activeConversationId === conv.id ? 'hover:bg-white/10' : ''
-                  )}
+                  className='opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg'
                 >
                   <svg width='12' height='12' viewBox='0 0 12 12' fill='none'>
                     <path
                       d='M2 3h8M5 3V2h2v1M4 3v6h4V3'
-                      stroke={activeConversationId === conv.id ? 'white' : '#ef4444'}
+                      stroke={isFallout ? t.border : '#ef4444'}
                       strokeWidth='1'
                       strokeLinecap='round'
                       strokeLinejoin='round'
@@ -134,9 +176,10 @@ export default function Sidebar({
 
             <button
               onClick={onDeleteAllConversations}
-              className='w-full mt-2 text-[10px] text-red-400 hover:text-red-600 py-1.5 hover:bg-red-50 rounded-lg transition-colors'
+              className='w-full mt-2 text-[10px] py-1.5 rounded-lg transition-colors'
+              style={{ color: isFallout ? t.border : '#ef4444' }}
             >
-              Clear all conversations
+              {isFallout ? '> Clear all logs_' : 'Clear all conversations'}
             </button>
           </>
         )}

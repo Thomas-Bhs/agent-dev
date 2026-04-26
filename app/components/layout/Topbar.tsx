@@ -1,8 +1,8 @@
 'use client';
-
-import { cn } from '@/app/lib/utils';
 import AgentChip from '../agents/AgentChip';
 import { Gauge } from 'lucide-react';
+import type { Theme } from '@/app/lib/theme';
+import { themes } from '@/app/lib/theme';
 
 interface ActiveAgent {
   name: string;
@@ -15,6 +15,7 @@ interface TopbarProps {
   onThemeToggle: () => void;
   onClear: () => void;
   onSettings: () => void;
+  theme: Theme;
 }
 
 export default function Topbar({
@@ -23,33 +24,97 @@ export default function Topbar({
   onThemeToggle,
   onClear,
   onSettings,
+  theme,
 }: TopbarProps) {
+  const t = themes[theme];
+  const isFallout = theme === 'fallout';
+
   return (
-    <div className='h-14 bg-white border-b border-gray-100 px-6 flex items-center justify-between flex-shrink-0'>
+    <div
+      className='h-14 px-6 flex items-center justify-between flex-shrink-0'
+      style={{
+        background: t.surface,
+        borderBottom: `1px solid ${t.border}`,
+      }}
+    >
       <div className='flex items-center gap-4'>
         <div className='flex items-center gap-2.5'>
-          <div className='w-8 h-8 bg-gray-950 rounded-xl flex items-center justify-center'>
+          <div
+            className='w-8 h-8 rounded-xl flex items-center justify-center'
+            style={{ background: isFallout ? t.border : '#0f0f1a' }}
+          >
             <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
-              <rect x='2' y='2' width='5' height='5' rx='1.5' fill='white' />
-              <rect x='9' y='2' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.5' />
-              <rect x='2' y='9' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.5' />
-              <rect x='9' y='9' width='5' height='5' rx='1.5' fill='white' fillOpacity='0.3' />
+              <rect x='2' y='2' width='5' height='5' rx='1.5' fill={isFallout ? t.bg : 'white'} />
+              <rect
+                x='9'
+                y='2'
+                width='5'
+                height='5'
+                rx='1.5'
+                fill={isFallout ? t.bg : 'white'}
+                fillOpacity='0.5'
+              />
+              <rect
+                x='2'
+                y='9'
+                width='5'
+                height='5'
+                rx='1.5'
+                fill={isFallout ? t.bg : 'white'}
+                fillOpacity='0.5'
+              />
+              <rect
+                x='9'
+                y='9'
+                width='5'
+                height='5'
+                rx='1.5'
+                fill={isFallout ? t.bg : 'white'}
+                fillOpacity='0.3'
+              />
             </svg>
           </div>
-          <span className='text-sm font-bold text-gray-950 tracking-tight'>
-            DevAgent<span className='font-normal text-gray-400'>OS</span>
+          <span
+            className='text-sm font-bold tracking-tight'
+            style={{
+              color: isFallout ? t.border : t.text,
+              fontFamily: isFallout ? 'monospace' : 'inherit',
+            }}
+          >
+            DevAgent<span style={{ color: t.textSecondary, fontWeight: 400 }}>OS</span>
           </span>
         </div>
 
-        <div className='w-px h-4 bg-gray-200' />
+        <div className='w-px h-4' style={{ background: t.border }} />
 
         <div className='flex items-center gap-1.5'>
           {activeAgents.length === 0 ? (
-            <span className='text-xs text-gray-400'>No agent selected</span>
+            <span className='text-xs' style={{ color: t.textSecondary }}>
+              No agent selected
+            </span>
           ) : (
-            activeAgents.map((agent) => (
-              <AgentChip key={agent.name} name={agent.name} color={agent.color} />
-            ))
+            activeAgents.map((agent) =>
+              isFallout ? (
+                <div
+                  key={agent.name}
+                  className='flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded fallout-selected'
+                  style={{
+                    background: `${t.border}15`,
+                    border: `1px solid ${t.border}`,
+                    color: t.border,
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  <div
+                    className='w-1.5 h-1.5 rounded-full animate-pulse'
+                    style={{ background: t.border }}
+                  />
+                  {`> ${agent.name.toUpperCase()}_`}
+                </div>
+              ) : (
+                <AgentChip key={agent.name} name={agent.name} color={agent.color} />
+              )
+            )
           )}
         </div>
       </div>
@@ -57,29 +122,35 @@ export default function Topbar({
       <div className='flex items-center gap-3'>
         <button
           onClick={onSettings}
-          className='w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors'
+          className='w-8 h-8 flex items-center justify-center rounded-xl transition-colors'
+          style={{ color: t.textSecondary }}
         >
-          <Gauge size={15} color='#9ca3af' />
+          <Gauge size={15} />
         </button>
 
         <button
           onClick={onThemeToggle}
-          className={cn(
-            'w-9 h-5 rounded-full relative transition-colors duration-200',
-            isDark ? 'bg-gray-950' : 'bg-gray-200'
-          )}
+          className='w-9 h-5 rounded-full relative transition-colors duration-200'
+          style={{ background: isFallout ? t.border : '#e5e7eb' }}
+          title={isFallout ? 'Switch to Spatial' : 'Switch to Fallout'}
         >
           <div
-            className={cn(
-              'w-4 h-4 bg-white rounded-full absolute top-0.5 transition-transform duration-200 shadow-sm',
-              isDark ? 'translate-x-4' : 'translate-x-0.5'
-            )}
+            className='w-4 h-4 rounded-full absolute top-0.5 transition-transform duration-200 shadow-sm'
+            style={{
+              background: isFallout ? t.bg : 'white',
+              transform: isFallout ? 'translateX(16px)' : 'translateX(2px)',
+            }}
           />
         </button>
 
         <button
           onClick={onClear}
-          className='text-xs text-gray-400 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors'
+          className='text-xs px-3 py-1.5 rounded-lg transition-colors'
+          style={{
+            color: t.textSecondary,
+            border: `1px solid ${t.border}`,
+            background: 'transparent',
+          }}
         >
           Clear
         </button>
