@@ -1,4 +1,6 @@
 import { cn } from '@/app/lib/utils';
+import type { Theme } from '@/app/lib/theme';
+import { themes } from '@/app/lib/theme';
 
 interface FileContent {
   name: string;
@@ -12,6 +14,7 @@ interface ChatInputProps {
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onFileChange: (file: FileContent | null) => void;
+  theme: Theme;
 }
 
 export default function ChatInput({
@@ -21,11 +24,27 @@ export default function ChatInput({
   onInputChange,
   onSubmit,
   onFileChange,
+  theme,
 }: ChatInputProps) {
+  const t = themes[theme];
+  const isFallout = theme === 'fallout';
+
   return (
-    <div className='px-6 py-4 bg-white border-t border-gray-100'>
+    <div
+      className='px-6 py-4'
+      style={{
+        background: t.surface,
+        borderTop: `1px solid ${t.border}`,
+      }}
+    >
       {fileContent && (
-        <div className='flex items-center gap-2 mb-3 px-3 py-2 bg-gray-950 rounded-xl w-fit'>
+        <div
+          className='flex items-center gap-2 mb-3 px-3 py-2 rounded-xl w-fit'
+          style={{
+            background: isFallout ? `${t.border}20` : '#0f0f1a',
+            border: isFallout ? `1px solid ${t.border}` : 'none',
+          }}
+        >
           <svg width='12' height='12' viewBox='0 0 12 12' fill='none'>
             <rect
               x='1.5'
@@ -33,22 +52,31 @@ export default function ChatInput({
               width='7'
               height='10'
               rx='1'
-              stroke='white'
+              stroke={isFallout ? t.border : 'white'}
               strokeOpacity='0.6'
               strokeWidth='1'
             />
             <path
               d='M3 4h5M3 6h4'
-              stroke='white'
+              stroke={isFallout ? t.border : 'white'}
               strokeOpacity='0.6'
               strokeWidth='0.8'
               strokeLinecap='round'
             />
           </svg>
-          <span className='text-xs text-white font-medium'>{fileContent.name}</span>
+          <span
+            className='text-xs font-medium'
+            style={{
+              color: isFallout ? t.border : 'white',
+              fontFamily: isFallout ? 'monospace' : 'inherit',
+            }}
+          >
+            {isFallout ? `> ${fileContent.name}_` : fileContent.name}
+          </span>
           <button
             onClick={() => onFileChange(null)}
-            className='text-white/40 hover:text-white text-sm leading-none ml-1 transition-colors'
+            className='text-sm leading-none ml-1 transition-colors'
+            style={{ color: isFallout ? t.border : 'rgba(255,255,255,0.4)' }}
           >
             ×
           </button>
@@ -59,24 +87,42 @@ export default function ChatInput({
         <input
           value={input}
           onChange={onInputChange}
-          placeholder='Ask a question or give an instruction...'
+          placeholder={
+            isFallout ? '> Enter command..._' : 'Ask a question or give an instruction...'
+          }
           disabled={isLoading}
-          className={cn(
-            'flex-1 px-4 py-3 text-sm border border-gray-200 rounded-2xl bg-gray-50 text-gray-900',
-            'focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-400 focus:bg-white',
-            'placeholder:text-gray-400 disabled:opacity-50 transition-all'
-          )}
+          className='flex-1 px-4 py-3 text-sm rounded-2xl outline-none transition-all disabled:opacity-50'
+          style={{
+            background: isFallout ? `${t.bg}` : '#f9fafb',
+            border: `1px solid ${t.border}`,
+            color: isFallout ? t.text : '#111',
+            fontFamily: isFallout ? 'monospace' : 'inherit',
+          }}
         />
 
         <label
-          className={cn(
-            'cursor-pointer flex items-center justify-center w-11 h-11',
-            'border border-gray-200 rounded-2xl bg-white hover:bg-gray-50 hover:border-gray-300 transition-colors'
-          )}
+          className='cursor-pointer flex items-center justify-center w-11 h-11 rounded-2xl transition-colors'
+          style={{
+            background: t.surface,
+            border: `1px solid ${t.border}`,
+          }}
         >
           <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
-            <rect x='1' y='2.5' width='12' height='10' rx='2' stroke='#9ca3af' strokeWidth='1' />
-            <path d='M5 2.5V1.5h5v1' stroke='#9ca3af' strokeWidth='1' strokeLinecap='round' />
+            <rect
+              x='1'
+              y='2.5'
+              width='12'
+              height='10'
+              rx='2'
+              stroke={isFallout ? t.border : '#9ca3af'}
+              strokeWidth='1'
+            />
+            <path
+              d='M5 2.5V1.5h5v1'
+              stroke={isFallout ? t.border : '#9ca3af'}
+              strokeWidth='1'
+              strokeLinecap='round'
+            />
           </svg>
           <input
             type='file'
@@ -95,19 +141,25 @@ export default function ChatInput({
         <button
           type='submit'
           disabled={isLoading || !input.trim()}
-          className={cn(
-            'w-11 h-11 flex items-center justify-center rounded-2xl transition-all',
-            'bg-blue-500 text-white hover:bg-blue-600 active:scale-95',
-            'disabled:opacity-30 disabled:cursor-not-allowed shadow-sm shadow-blue-200'
-          )}
+          className='w-11 h-11 flex items-center justify-center rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed'
+          style={{
+            background: isFallout ? t.border : '#3b82f6',
+            color: isFallout ? t.bg : 'white',
+          }}
         >
           {isLoading ? (
-            <div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin' />
+            <div
+              className='w-4 h-4 border-2 rounded-full animate-spin'
+              style={{
+                borderColor: `${isFallout ? t.bg : 'rgba(255,255,255,0.3)'}`,
+                borderTopColor: isFallout ? t.surface : 'white',
+              }}
+            />
           ) : (
             <svg width='16' height='16' viewBox='0 0 16 16' fill='none'>
               <path
                 d='M3 8h10M9 4l4 4-4 4'
-                stroke='white'
+                stroke={isFallout ? t.bg : 'white'}
                 strokeWidth='1.5'
                 strokeLinecap='round'
                 strokeLinejoin='round'
